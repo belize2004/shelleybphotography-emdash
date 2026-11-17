@@ -2,16 +2,20 @@
   theme.css -- Luxury Editorial Styling inspired by Dixon Creative & Shelley B Photography
 */
 
-:root {
-	/* Rich Editorial Dark/Champagne Palette */
-	--color-bg: light-dark(#111111, #0a0a0a);
-	--color-surface: light-dark(#181818, #121212);
-	--color-fill: light-dark(#222222, #1c1c1c);
-	--color-text: light-dark(#f5f5f5, #ffffff);
-	--color-text-secondary: light-dark(#b8b5ad, #9e9b95);
-	--color-muted: light-dark(#88847d, #737069);
-	--color-border: light-dark(#2e2d2a, #262522);
-	--color-border-strong: light-dark(#4a4740, #383530);
+:root,
+html,
+body {
+	color-scheme: dark !important;
+
+	/* Force Pure Luxury Dark Palette */
+	--color-bg: #111111 !important;
+	--color-surface: #181818 !important;
+	--color-fill: #222222 !important;
+	--color-text: #f5f5f5 !important;
+	--color-text-secondary: #b8b5ad !important;
+	--color-muted: #88847d !important;
+	--color-border: #2e2d2a !important;
+	--color-border-strong: #4a4740 !important;
 
 	/* Gold / Champagne Accents */
 	--color-accent: #c9a96e;
@@ -37,12 +41,23 @@
 	--radius-full: 999px;
 }
 
-/* Global enhancements */
+/* Global resets for dark canvas */
+html {
+	background-color: #111111 !important;
+}
+
 body {
-	background-color: var(--color-bg);
-	color: var(--color-text);
+	background-color: #111111 !important;
+	color: #f5f5f5 !important;
 	font-family: var(--font-body);
 	-webkit-font-smoothing: antialiased;
+	min-height: 100vh;
+}
+
+main {
+	background-color: #111111 !important;
+	display: block !important;
+	width: 100% !important;
 }
 
 ::selection {
@@ -50,7 +65,6 @@ body {
 	color: #111111;
 }
 
-/* Links & Accents */
 a:hover {
 	color: var(--color-accent-light);
 }
