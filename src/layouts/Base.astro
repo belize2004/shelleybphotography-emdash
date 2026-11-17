@@ -17,6 +17,7 @@ interface Props {
 	robots?: string | null;
 	type?: "website" | "article";
 	content?: { collection: string; id: string; slug?: string | null };
+	hideHeader?: boolean;
 }
 
 const {
@@ -28,6 +29,7 @@ const {
 	robots,
 	type = "website",
 	content,
+	hideHeader = false,
 } = Astro.props;
 const [settingsResult, menuResult, footerMenuResult] = await Promise.all([
 	getSiteSettingsWithCacheHint(),
@@ -162,6 +164,7 @@ const year = new Date().getFullYear();
 	<body>
 		<EmDashBodyStart page={pageCtx} />
 		<a href="#main" class="skip-link">Skip to content</a>
+		{!hideHeader && (
 		<header class="site-header">
 			<div class="frame">
 				<div
@@ -220,6 +223,7 @@ const year = new Date().getFullYear();
 				</div>
 			</div>
 		</header>
+		)}
 
 		<main id="main" tabindex="-1">
 			<slot />

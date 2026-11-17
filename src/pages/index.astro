@@ -7,7 +7,6 @@ import {
 } from "emdash";
 import Base from "../layouts/Base.astro";
 import SiteHeader from "../components/SiteHeader.astro";
-import EditorialMasthead from "../components/EditorialMasthead.astro";
 import DixonLookbookGrid from "../components/DixonLookbookGrid.astro";
 import ExperiencePricing from "../components/ExperiencePricing.astro";
 import InquiryForm from "../components/InquiryForm.astro";
@@ -24,34 +23,32 @@ const seo = home
 	? getSeoMeta(home, {
 			siteUrl: Astro.url.origin,
 			path: "/",
-			defaultTitle: `${siteTitle} | Gulf Coast Family Beach & Senior Portraits`,
+			defaultTitle: `${siteTitle} | Senior, Sports & Milestone Photography`,
 			defaultDescription:
-				"Luxury Gulf Coast beach portraits & editorial senior photography by Shelley & Blaine Bressman. Serving Pensacola Beach, Gulf Shores, and Orange Beach.",
+				"Editorial-style portraits and fine-art coastal photography by Shelley & Blaine Bressman. Serving Gulf Shores, Orange Beach, and Pensacola.",
 		})
 	: null;
 ---
 
 <Base
-	title={seo?.title ?? `${siteTitle} | Gulf Coast Family Beach Portraits`}
+	title={seo?.title ?? `${siteTitle} | Senior, Sports & Milestone Photography`}
 	pageTitle={seo?.ogTitle ?? siteTitle}
-	description={seo?.description ?? "Fine-art beach family portraits in Gulf Shores, Orange Beach & Pensacola."}
+	description={seo?.description ?? "Editorial-style portraits by Shelley B Photography"}
 	image={seo?.ogImage ?? "https://shelleybphotography.com/images/hero.jpg"}
 	canonical={seo?.canonical}
 	robots={seo?.robots}
+	hideHeader={true}
 	content={home
 		? { collection: "pages", id: home.data.id, slug: home.id }
 		: undefined}
 >
-	<!-- Dixon Creative Luxury Site Header -->
+	<!-- Single Clean Dixon Creative Header -->
 	<SiteHeader />
 
-	<!-- Editorial Studio Masthead Header & Session Strip -->
-	<EditorialMasthead />
-
-	<!-- Dixon Creative 3-Column Luxury Lookbook Card Grid -->
+	<!-- Dixon Creative 3-Column Luxury Lookbook Card Grid (First & Prominent) -->
 	<DixonLookbookGrid />
 
-	<!-- The Experience, Husband & Wife Bio, Reviews, and Pricing Collections -->
+	<!-- The Experience & All-Inclusive Pricing Collections -->
 	<ExperiencePricing />
 
 	<!-- Session Inquiry / Booking Drawer Form -->
