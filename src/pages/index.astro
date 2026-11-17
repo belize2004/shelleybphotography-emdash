@@ -8,7 +8,6 @@ import {
 import Base from "../layouts/Base.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import DixonLookbookGrid from "../components/DixonLookbookGrid.astro";
-import ExperiencePricing from "../components/ExperiencePricing.astro";
 import InquiryForm from "../components/InquiryForm.astro";
 
 const [settings, homeResult] = await Promise.all([
@@ -42,15 +41,12 @@ const seo = home
 		? { collection: "pages", id: home.data.id, slug: home.id }
 		: undefined}
 >
-	<!-- Single Clean Dixon Creative Header -->
+	<!-- Clean Dixon Creative Header -->
 	<SiteHeader />
 
-	<!-- Dixon Creative 3-Column Luxury Lookbook Card Grid (First & Prominent) -->
+	<!-- Dixon Creative 3-Column Luxury Lookbook Card Grid -->
 	<DixonLookbookGrid />
 
-	<!-- The Experience & All-Inclusive Pricing Collections -->
-	<ExperiencePricing />
-
-	<!-- Session Inquiry / Booking Drawer Form -->
+	<!-- Session Inquiry / Booking Form -->
 	<InquiryForm />
 </Base>
