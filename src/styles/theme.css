@@ -1,0 +1,62 @@
+/*
+  theme.css -- Luxury Editorial Styling inspired by Dixon Creative & Shelley B Photography
+*/
+
+:root {
+	/* Rich Editorial Dark/Champagne Palette */
+	--color-bg: light-dark(#111111, #0a0a0a);
+	--color-surface: light-dark(#181818, #121212);
+	--color-fill: light-dark(#222222, #1c1c1c);
+	--color-text: light-dark(#f5f5f5, #ffffff);
+	--color-text-secondary: light-dark(#b8b5ad, #9e9b95);
+	--color-muted: light-dark(#88847d, #737069);
+	--color-border: light-dark(#2e2d2a, #262522);
+	--color-border-strong: light-dark(#4a4740, #383530);
+
+	/* Gold / Champagne Accents */
+	--color-accent: #c9a96e;
+	--color-accent-light: #e5cd9e;
+	--color-accent-glow: rgba(201, 169, 110, 0.18);
+	--color-brand: #c9a96e;
+	--color-on-brand: #111111;
+	--color-brand-ring: rgba(201, 169, 110, 0.4);
+
+	/* Typography assignments */
+	--font-heading: var(--font-serif, "Instrument Serif", Georgia, serif);
+	--font-body: var(--font-sans, "DM Sans", -apple-system, sans-serif);
+	--font-label: var(--font-sans, "DM Sans", sans-serif);
+	--font-mono: var(--font-mono, "Fragment Mono", monospace);
+
+	--font-weight-heading: 400;
+	--font-weight-display: 400;
+	--font-weight-wordmark: 500;
+	--tracking-display: -0.01em;
+	--tracking-tight: -0.015em;
+
+	--radius: 8px;
+	--radius-full: 999px;
+}
+
+/* Global enhancements */
+body {
+	background-color: var(--color-bg);
+	color: var(--color-text);
+	font-family: var(--font-body);
+	-webkit-font-smoothing: antialiased;
+}
+
+::selection {
+	background: var(--color-accent);
+	color: #111111;
+}
+
+/* Links & Accents */
+a:hover {
+	color: var(--color-accent-light);
+}
+
+.gold-gradient-text {
+	background: linear-gradient(135deg, #f5ebd7 0%, #c9a96e 50%, #ae8a4b 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}

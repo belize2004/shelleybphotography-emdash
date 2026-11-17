@@ -1,0 +1,816 @@
+{
+	"$schema": "https://emdashcms.com/seed.schema.json",
+	"version": "1",
+	"meta": {
+		"name": "Portfolio Starter",
+		"description": "An editorial portfolio for studios and independent designers, with an indexed work list, case studies and galleries",
+		"author": "EmDash"
+	},
+	"settings": {
+		"title": "Shelley B Photography",
+		"tagline": "Fine-art Gulf Coast family beach portraits and personalized senior sessions along the Emerald Coast.",
+		"logo": {
+			"url": "/images/logo.avif",
+			"alt": "Shelley B Photography"
+		},
+		"seo": {
+			"titleSeparator": "·"
+		},
+		"social": {
+			"facebook": "https://www.facebook.com/shelleybphotography",
+			"instagram": "https://www.instagram.com/shelleybphotography"
+		}
+	},
+	"blockTypes": [
+		{
+			"slug": "portfolio_statement",
+			"label": "Statement",
+			"description": "A large statement with an optional small label beside it. As the first block, it is the page heading. Line breaks are kept.",
+			"icon": "quotes",
+			"category": "Portfolio",
+			"currentVersion": 1,
+			"versions": [
+				{
+					"version": 1,
+					"fields": [
+						{
+							"slug": "text",
+							"label": "Statement",
+							"type": "text",
+							"required": true,
+							"validation": {
+								"maxLength": 160
+							}
+						},
+						{
+							"slug": "label",
+							"label": "Small label",
+							"type": "string",
+							"validation": {
+								"maxLength": 40
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"slug": "portfolio_selected_work",
+			"label": "Selected work",
+			"description": "Projects with Feature on home page switched on, newest first and up to 12, or the six newest when none are.",
+			"icon": "grid-four",
+			"category": "Portfolio",
+			"currentVersion": 1,
+			"versions": [
+				{
+					"version": 1,
+					"fields": [
+						{
+							"slug": "heading",
+							"label": "Heading",
+							"type": "string",
+							"required": true,
+							"defaultValue": "Selected work",
+							"validation": {
+								"maxLength": 40
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"slug": "portfolio_clients",
+			"label": "Clients",
+			"description": "A line of client names",
+			"icon": "handshake",
+			"category": "Portfolio",
+			"currentVersion": 1,
+			"versions": [
+				{
+					"version": 1,
+					"fields": [
+						{
+							"slug": "heading",
+							"label": "Heading",
+							"type": "string",
+							"required": true,
+							"defaultValue": "Clients",
+							"validation": {
+								"maxLength": 40
+							}
+						},
+						{
+							"slug": "clients",
+							"label": "Clients",
+							"type": "repeater",
+							"required": true,
+							"validation": {
+								"minItems": 1,
+								"maxItems": 40,
+								"subFields": [
+									{
+										"slug": "name",
+										"label": "Name",
+										"type": "string",
+										"required": true
+									}
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"slug": "portfolio_contact",
+			"label": "Contact details",
+			"description": "A heading, an introduction, a large email link and studio details, followed by the social profiles from Settings. As the first block, it is the page heading.",
+			"icon": "envelope-simple",
+			"category": "Portfolio",
+			"currentVersion": 1,
+			"versions": [
+				{
+					"version": 1,
+					"fields": [
+						{
+							"slug": "heading",
+							"label": "Heading",
+							"type": "string",
+							"required": true,
+							"defaultValue": "Get in touch",
+							"validation": {
+								"maxLength": 80
+							}
+						},
+						{
+							"slug": "label",
+							"label": "Small label",
+							"type": "string",
+							"validation": {
+								"maxLength": 40
+							}
+						},
+						{
+							"slug": "intro",
+							"label": "Introduction",
+							"type": "text",
+							"validation": {
+								"maxLength": 400
+							}
+						},
+						{
+							"slug": "email",
+							"label": "Email address",
+							"type": "string",
+							"required": true,
+							"validation": {
+								"maxLength": 254,
+								"pattern": "^[^\\s@:/]+@[^\\s@:/]+\\.[^\\s@:/]+$"
+							}
+						},
+						{
+							"slug": "email_label",
+							"label": "Label above the email in the details",
+							"type": "string",
+							"defaultValue": "Email",
+							"validation": {
+								"maxLength": 40
+							}
+						},
+						{
+							"slug": "details",
+							"label": "Studio details",
+							"type": "repeater",
+							"validation": {
+								"maxItems": 6,
+								"subFields": [
+									{
+										"slug": "label",
+										"label": "Label",
+										"type": "string",
+										"required": true
+									},
+									{
+										"slug": "text",
+										"label": "Text",
+										"type": "string",
+										"required": true
+									},
+									{
+										"slug": "note",
+										"label": "Note (smaller, below the text)",
+										"type": "string"
+									}
+								]
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"collections": [
+		{
+			"slug": "projects",
+			"label": "Projects",
+			"labelSingular": "Project",
+			"description": "Case studies, listed at /work. Switch on Feature on home page to show a project in Selected work.",
+			"icon": "briefcase",
+			"sortOrder": 1,
+			"admin": {
+				"listColumns": [
+					"client",
+					"year",
+					"featured"
+				]
+			},
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search",
+				"seo"
+			],
+			"urlPattern": "/work/{slug}",
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "featured_image",
+					"label": "Cover image",
+					"type": "image",
+					"required": true
+				},
+				{
+					"slug": "summary",
+					"label": "Summary",
+					"type": "text",
+					"searchable": true,
+					"validation": {
+						"maxLength": 200
+					}
+				},
+				{
+					"slug": "client",
+					"label": "Client",
+					"type": "string",
+					"searchable": true
+				},
+				{
+					"slug": "year",
+					"label": "Year",
+					"type": "string",
+					"translatable": false
+				},
+				{
+					"slug": "url",
+					"label": "Website",
+					"type": "url",
+					"validation": {
+						"pattern": "^https?://"
+					}
+				},
+				{
+					"slug": "featured",
+					"label": "Feature on home page",
+					"type": "boolean",
+					"defaultValue": false,
+					"translatable": false
+				},
+				{
+					"slug": "content",
+					"label": "Content",
+					"type": "portableText",
+					"searchable": true
+				},
+				{
+					"slug": "gallery",
+					"label": "Gallery",
+					"type": "repeater",
+					"validation": {
+						"maxItems": 24,
+						"subFields": [
+							{
+								"slug": "image",
+								"label": "Image",
+								"type": "image",
+								"required": true
+							},
+							{
+								"slug": "caption",
+								"label": "Caption",
+								"type": "string"
+							}
+						]
+					}
+				}
+			]
+		},
+		{
+			"slug": "pages",
+			"label": "Pages",
+			"labelSingular": "Page",
+			"description": "About, Contact, the home page (slug home, shown at /) and any other page, each at /{slug}.",
+			"sortOrder": 2,
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search",
+				"seo"
+			],
+			"urlPattern": "/{slug}",
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "content",
+					"label": "Content",
+					"type": "portableText",
+					"searchable": true
+				},
+				{
+					"slug": "layout",
+					"label": "Layout",
+					"type": "blocks",
+					"validation": {
+						"allowedTypes": [
+							"portfolio_statement",
+							"portfolio_selected_work",
+							"portfolio_clients",
+							"portfolio_contact"
+						],
+						"maxItems": 20
+					}
+				}
+			]
+		}
+	],
+	"taxonomies": [
+		{
+			"name": "tag",
+			"label": "Specialties & Locations",
+			"terms": [
+				{
+					"slug": "beach-portraits",
+					"name": "Beach Portraits"
+				},
+				{
+					"slug": "senior-portraits",
+					"name": "Senior Portraits"
+				},
+				{
+					"slug": "gulf-shores",
+					"name": "Gulf Shores"
+				},
+				{
+					"slug": "orange-beach",
+					"name": "Orange Beach"
+				},
+				{
+					"slug": "pensacola-beach",
+					"name": "Pensacola Beach"
+				},
+				{
+					"slug": "perdido-key",
+					"name": "Perdido Key"
+				}
+			]
+		}
+	],
+	"menus": [
+		{
+			"name": "primary",
+			"label": "Main Navigation",
+			"items": [
+				{
+					"label": "Sessions",
+					"url": "/#sessions"
+				},
+				{
+					"label": "Lookbook",
+					"url": "/#lookbook"
+				},
+				{
+					"label": "Experience",
+					"url": "/#experience"
+				},
+				{
+					"label": "Pricing & Info",
+					"url": "/#pricing"
+				},
+				{
+					"label": "Reviews",
+					"url": "/#reviews"
+				},
+				{
+					"label": "About",
+					"url": "/about"
+				},
+				{
+					"label": "Contact",
+					"url": "/contact"
+				}
+			]
+		},
+		{
+			"name": "footer",
+			"label": "Reserve Your Golden Hour Session",
+			"items": [
+				{
+					"label": "Inquire Now",
+					"url": "/contact"
+				},
+				{
+					"label": "Call (850) 490-5147",
+					"url": "tel:8504905147"
+				}
+			]
+		}
+	],
+	"content": {
+		"pages": [
+			{
+				"id": "home",
+				"slug": "home",
+				"status": "published",
+				"data": {
+					"title": "Home",
+					"layout": [
+						{
+							"_type": "portfolio_statement",
+							"_version": 1,
+							"_key": "statement",
+							"label": "Emerald Coast · Est. 2021",
+							"text": "Luxury Gulf Coast beach portraits & editorial senior milestones by Shelley & Blaine Bressman. Published in The Wall Street Journal."
+						},
+						{
+							"_type": "portfolio_selected_work",
+							"_version": 1,
+							"_key": "selected-work",
+							"heading": "Signature Sessions"
+						},
+						{
+							"_type": "portfolio_clients",
+							"_version": 1,
+							"_key": "clients",
+							"heading": "Featured In",
+							"clients": [
+								{
+									"name": "The Wall Street Journal"
+								},
+								{
+									"name": "Pensacola Magazine"
+								},
+								{
+									"name": "Gulf Shores Visitor Guide"
+								},
+								{
+									"name": "Orange Beach Concierge"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "about",
+				"slug": "about",
+				"status": "published",
+				"data": {
+					"title": "Meet Shelley & Blaine Bressman",
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "My name is Shelley. In 2021 my church was in need of a photographer. After a month of using equipment I had for 20 years, I decided it was time to invest in newer, better gear — and to start doing photography professionally. I haven’t looked back."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Published in The Wall Street Journal"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "In early 2023, the Wall Street Journal commissioned me to photograph a retired couple in Orange Beach, including their home on Ono Island and portraits on the beach. It was published in the prestigious Global Luxury Mansion section."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Husband & Wife Photography Team"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "My husband Blaine and I now shoot together. I focus on natural posing, lighting, and connection, while Blaine watches for those candid, unscripted moments that make your family unique. Together, we bring a seamless, stress-free experience to your sunset beach session."
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "contact",
+				"slug": "contact",
+				"status": "published",
+				"data": {
+					"title": "Contact",
+					"layout": [
+						{
+							"_type": "portfolio_contact",
+							"_version": 1,
+							"_key": "contact-block",
+							"heading": "Let’s create heirloom portraits together",
+							"label": "Inquire Session",
+							"intro": "Tell us about your family, your vacation dates, and where you are staying along the Gulf Coast. We will follow up promptly with availability and package details.",
+							"email": "shelley@shelleybphotography.com",
+							"email_label": "Direct Email",
+							"details": [
+								{
+									"label": "Phone",
+									"text": "(850) 490-5147"
+								},
+								{
+									"label": "Locations",
+									"text": "Pensacola Beach · Gulf Shores · Orange Beach · Perdido Key · 30A"
+								},
+								{
+									"label": "Turnaround",
+									"text": "10-14 days for hand-edited gallery"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"projects": [
+			{
+				"id": "gulf-shores-family-sunset",
+				"slug": "gulf-shores-family-sunset",
+				"status": "published",
+				"data": {
+					"title": "Gulf Shores Golden Hour Family Portrait",
+					"client": "The Henderson Family",
+					"year": "2026",
+					"featured": true,
+					"summary": "Multi-generational heirloom portraits on the sugar-white sand dunes of Gulf Shores at sunset.",
+					"featured_image": {
+						"$media": {
+							"url": "https://shelleybphotography.com/photos/medium/0bc30285-6121-434d-9091-445aaf08499e.avif/",
+							"alt": "Gulf Coast family gathered at the shoreline at sunset",
+							"filename": "gulf-shores-family.avif"
+						}
+					},
+					"gallery": [
+						{
+							"image": {
+								"$media": {
+									"url": "https://shelleybphotography.com/photos/medium/087b8fa9-9387-4a41-a8c9-d61e1b86313e.avif/",
+									"alt": "Family walking hand-in-hand along the tide line",
+									"filename": "beach-walk.avif"
+								}
+							},
+							"caption": "Natural candid stroll by the tide pool"
+						},
+						{
+							"image": {
+								"$media": {
+									"url": "https://shelleybphotography.com/photos/medium/9e537716-8b5b-4780-a491-55a6461d9f4b.avif/",
+									"alt": "Children laughing in the ocean breeze",
+									"filename": "kids-candid.avif"
+								}
+							},
+							"caption": "Capturing authentic laughter and emotion"
+						},
+						{
+							"image": {
+								"$media": {
+									"url": "https://shelleybphotography.com/photos/medium/c9e76f23-c278-43b4-a75c-081db6fb9ee8.avif/",
+									"alt": "Warm sunset backlight over the emerald water",
+									"filename": "sunset-glow.avif"
+								}
+							},
+							"caption": "Signature golden hour backlight"
+						}
+					]
+				},
+				"taxonomies": {
+					"tag": [
+						"beach-portraits",
+						"gulf-shores"
+					]
+				}
+			},
+			{
+				"id": "pensacola-senior-milestone",
+				"slug": "pensacola-senior-milestone",
+				"status": "published",
+				"data": {
+					"title": "Pensacola Senior & Sports Milestone",
+					"client": "Ethan & The Miller Family",
+					"year": "2026",
+					"featured": true,
+					"summary": "Editorial athletic and lifestyle senior session celebrating high school milestones in downtown Pensacola.",
+					"featured_image": {
+						"$media": {
+							"url": "https://shelleybphotography.com/images/gallery/seniors/senior-hero-downtown.jpg",
+							"alt": "Senior portrait in downtown Pensacola",
+							"filename": "senior-hero.jpg"
+						}
+					},
+					"gallery": [
+						{
+							"image": {
+								"$media": {
+									"url": "https://shelleybphotography.com/photos/medium/d37ff0de-26df-4204-8ed3-470d8c1b2128.avif/",
+									"alt": "High school senior sports portrait",
+									"filename": "sports-portrait.avif"
+								}
+							},
+							"caption": "Dramatic lighting for senior athletic portraits"
+						}
+					]
+				},
+				"taxonomies": {
+					"tag": [
+						"senior-portraits",
+						"pensacola-beach"
+					]
+				}
+			},
+			{
+				"id": "wall-street-journal-feature",
+				"slug": "wall-street-journal-feature",
+				"status": "published",
+				"data": {
+					"title": "Wall Street Journal Luxury Editorial",
+					"client": "Wall Street Journal Global Luxury Mansion",
+					"year": "2023",
+					"featured": true,
+					"summary": "Published feature capturing an Ono Island luxury residence and coastal portraits on the Ono beach.",
+					"featured_image": {
+						"$media": {
+							"url": "https://shelleybphotography.com/photos/medium/d7fbc79a-85df-48cc-bbe6-c73e7375de2c.avif/",
+							"alt": "WSJ Ono Island Beach Portrait Session",
+							"filename": "wsj-ono-island.avif"
+						}
+					},
+					"gallery": [
+						{
+							"image": {
+								"$media": {
+									"url": "https://shelleybphotography.com/photos/medium/15fe48e7-4035-437a-b7ea-501bb136e86c.avif/",
+									"alt": "Architectural coastal sunset portrait",
+									"filename": "ono-island-sunset.avif"
+								}
+							},
+							"caption": "Commissioned for WSJ Global Luxury Mansion section"
+						}
+					]
+				},
+				"taxonomies": {
+					"tag": [
+						"beach-portraits",
+						"orange-beach"
+					]
+				}
+			},
+			{
+				"id": "orange-beach-extended-family",
+				"slug": "orange-beach-extended-family",
+				"status": "published",
+				"data": {
+					"title": "Orange Beach Multi-Generation Family Legacy",
+					"client": "The Carters",
+					"year": "2025",
+					"featured": true,
+					"summary": "Gathering 14 family members across 3 generations on the tranquil beaches of Orange Beach.",
+					"featured_image": {
+						"$media": {
+							"url": "https://shelleybphotography.com/photos/medium/d289b550-faa1-4eb6-8e6b-e035c093be74.avif/",
+							"alt": "Extended family smiling together on Orange Beach",
+							"filename": "orange-beach-extended.avif"
+						}
+					},
+					"gallery": [
+						{
+							"image": {
+								"$media": {
+									"url": "https://shelleybphotography.com/photos/medium/1392d18e-6956-4969-9d82-580ac06d2e23.avif/",
+									"alt": "Grandparents with grandchildren",
+									"filename": "grandparents-candid.avif"
+								}
+							},
+							"caption": "Cherished moments with grandchildren"
+						}
+					]
+				},
+				"taxonomies": {
+					"tag": [
+						"beach-portraits",
+						"orange-beach"
+					]
+				}
+			},
+			{
+				"id": "perdido-key-sunset-collection",
+				"slug": "perdido-key-sunset-collection",
+				"status": "published",
+				"data": {
+					"title": "Perdido Key Coastal Dunes Collection",
+					"client": "The Ramirez Family",
+					"year": "2026",
+					"featured": true,
+					"summary": "Intimate family portraits nestled against sea oats and pristine nature reserve dunes.",
+					"featured_image": {
+						"$media": {
+							"url": "https://shelleybphotography.com/photos/medium/39229855-85c8-446f-a7c8-04ea40a5ef08.avif/",
+							"alt": "Perdido key sand dunes and emerald water",
+							"filename": "perdido-key-dunes.avif"
+						}
+					},
+					"gallery": [
+						{
+							"image": {
+								"$media": {
+									"url": "https://shelleybphotography.com/photos/medium/08509244-ce3d-46f3-ad6f-cf3fdd689789.avif/",
+									"alt": "Children playing on the dunes",
+									"filename": "dunes-play.avif"
+								}
+							},
+							"caption": "Perdido Key state park coastline"
+						}
+					]
+				},
+				"taxonomies": {
+					"tag": [
+						"beach-portraits",
+						"perdido-key"
+					]
+				}
+			},
+			{
+				"id": "emerald-coast-coastal-babies",
+				"slug": "emerald-coast-coastal-babies",
+				"status": "published",
+				"data": {
+					"title": "Emerald Coast Toddlers & Little Milestones",
+					"client": "The Sullivan Family",
+					"year": "2026",
+					"featured": true,
+					"summary": "Morning sunrise session with calm breezes, gentle tides, and pure joy for little ones.",
+					"featured_image": {
+						"$media": {
+							"url": "https://shelleybphotography.com/photos/medium/0c99c316-d5dd-4eca-af27-eb67d7dfadbb.avif/",
+							"alt": "Toddler laughing at water edge",
+							"filename": "coastal-toddler.avif"
+						}
+					},
+					"gallery": []
+				},
+				"taxonomies": {
+					"tag": [
+						"beach-portraits",
+						"pensacola-beach"
+					]
+				}
+			}
+		]
+	}
+}

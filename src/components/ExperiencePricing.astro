@@ -1,0 +1,357 @@
+---
+// Experience, Reviews & Pricing section inspired by Dixon Creative & Shelley B Photography
+---
+
+<section id="experience" class="experience-section">
+	<div class="experience-grid">
+		<div class="experience-col">
+			<span class="section-badge">THE EXPERIENCE</span>
+			<h2 class="experience-title">Unhurried. Relaxed. <em>Genuinely You.</em></h2>
+			<p class="experience-p">
+				Taking family portraits on vacation or senior milestones shouldn't feel like high-stress wrangling. 
+				We guide you through natural, unforced interactions with the emerald water and soft Gulf breezes as our backdrop.
+			</p>
+
+			<div class="team-card">
+				<img src="/images/portrait.avif" alt="Shelley Bressman" class="team-img" />
+				<div class="team-info">
+					<h4>Shelley & Blaine Bressman</h4>
+					<p class="team-role">Husband & Wife Photography Team</p>
+					<p class="team-bio">
+						“I work on composition, lighting and poses, while Blaine watches for those candid, spontaneous smiles. You get two pairs of eyes capturing every angle.”
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="experience-col">
+			<span class="section-badge">PRAISE & REVIEWS</span>
+			<div class="reviews-slider">
+				<div class="review-box">
+					<div class="stars">★★★★★</div>
+					<blockquote>
+						“We had a session on the beach with 10 members of our family. Shelley was wonderful with everyone, including my one-year-old nephew. She arrived early and worked so effortlessly with all of us!”
+					</blockquote>
+					<cite>— Sarah M., Gulf Shores Vacationer</cite>
+				</div>
+
+				<div class="review-box">
+					<div class="stars">★★★★★</div>
+					<blockquote>
+						“Shelley and her husband made the whole process completely stress-free (and we had to coordinate a lot of people and a cranky toddler!). The photos are stunning.”
+					</blockquote>
+					<cite>— David & Jennifer K., Orange Beach</cite>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Pricing & Investment Table -->
+	<div id="pricing" class="pricing-container">
+		<div class="pricing-header">
+			<span class="section-badge">COLLECTIONS & INVESTMENT</span>
+			<h3 class="pricing-title">Simple, All-Inclusive Session Packages</h3>
+			<p class="pricing-subtitle">Each session includes hand-retouched, high-resolution digital files with print release and private online gallery.</p>
+		</div>
+
+		<div class="pricing-cards">
+			<div class="price-card">
+				<span class="tier-name">Sunrise Petite / Senior</span>
+				<div class="tier-price">$300<span>+</span></div>
+				<p class="tier-desc">Ideal for seniors, milestones, or immediate families wanting quiet morning light.</p>
+				<ul class="tier-features">
+					<li>✓ 30–45 minute beach or downtown session</li>
+					<li>✓ Up to 5 family members or 1 senior</li>
+					<li>✓ 15 high-resolution edited images</li>
+					<li>✓ Print release & online download</li>
+				</ul>
+				<a href="#inquire" class="tier-btn">Select Collection</a>
+			</div>
+
+			<div class="price-card featured">
+				<div class="badge-pop">MOST POPULAR</div>
+				<span class="tier-name">Golden Hour Sunset</span>
+				<div class="tier-price">$600</div>
+				<p class="tier-desc">Our signature family beach experience during breathtaking Gulf Coast sunset lighting.</p>
+				<ul class="tier-features">
+					<li>✓ 60-minute sunset session</li>
+					<li>✓ Up to 10 family members</li>
+					<li>✓ Full curated gallery (35+ edited photos)</li>
+					<li>✓ 2 Photographers (Shelley & Blaine)</li>
+					<li>✓ Complete print release & mobile gallery app</li>
+				</ul>
+				<a href="#inquire" class="tier-btn primary">Reserve Sunset Date</a>
+			</div>
+
+			<div class="price-card">
+				<span class="tier-name">Multi-Gen Extended Family</span>
+				<div class="tier-price">$800<span>–$1000</span></div>
+				<p class="tier-desc">Designed for large family reunions, anniversaries, and multi-generation gatherings.</p>
+				<ul class="tier-features">
+					<li>✓ 75–90 minute relaxed sunset session</li>
+					<li>✓ Up to 25+ family members & all breakout pairings</li>
+					<li>✓ 60+ hand-finished heirloom images</li>
+					<li>✓ 2 Photographers ensuring no moment is missed</li>
+					<li>✓ High-priority turnaround</li>
+				</ul>
+				<a href="#inquire" class="tier-btn">Inquire Extended</a>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.experience-section {
+		max-width: var(--frame-width);
+		margin-inline: auto;
+		padding-inline: var(--page-margin);
+		padding-block: var(--section-gap);
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.experience-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+		gap: clamp(2rem, 5vw, 5rem);
+		align-items: start;
+	}
+
+	.section-badge {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.15em;
+		color: var(--color-accent);
+		text-transform: uppercase;
+		display: block;
+		margin-bottom: 0.75rem;
+	}
+
+	.experience-title {
+		font-family: var(--font-heading);
+		font-size: clamp(2.2rem, 3.5vw, 3.2rem);
+		font-weight: 400;
+		line-height: 1.15;
+		margin: 0 0 1.25rem;
+	}
+
+	.experience-title em {
+		color: var(--color-accent);
+	}
+
+	.experience-p {
+		font-size: 1rem;
+		line-height: 1.7;
+		color: var(--color-text-secondary);
+		margin-bottom: 2rem;
+	}
+
+	.team-card {
+		display: flex;
+		gap: 1.25rem;
+		padding: 1.5rem;
+		background: #181818;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		align-items: center;
+	}
+
+	.team-img {
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		object-fit: cover;
+		border: 2px solid var(--color-accent);
+	}
+
+	.team-info h4 {
+		font-family: var(--font-heading);
+		font-size: 1.2rem;
+		margin: 0;
+	}
+
+	.team-role {
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		color: var(--color-accent);
+		text-transform: uppercase;
+		margin-top: 2px;
+	}
+
+	.team-bio {
+		font-size: 0.85rem;
+		color: var(--color-text-secondary);
+		margin-top: 0.5rem;
+		line-height: 1.5;
+	}
+
+	.reviews-slider {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.review-box {
+		padding: 1.5rem;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+	}
+
+	.stars {
+		color: var(--color-accent);
+		font-size: 1.1rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.review-box blockquote {
+		font-family: var(--font-serif);
+		font-size: 1.15rem;
+		line-height: 1.5;
+		color: var(--color-text);
+		margin-bottom: 0.75rem;
+	}
+
+	.review-box cite {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		color: var(--color-muted);
+		text-transform: uppercase;
+		font-style: normal;
+	}
+
+	/* Pricing */
+	.pricing-container {
+		margin-top: 5rem;
+		padding-top: 4rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.pricing-header {
+		text-align: center;
+		max-width: 650px;
+		margin-inline: auto;
+		margin-bottom: 3rem;
+	}
+
+	.pricing-title {
+		font-family: var(--font-heading);
+		font-size: clamp(2rem, 3.5vw, 3rem);
+		margin: 0.5rem 0 1rem;
+	}
+
+	.pricing-subtitle {
+		color: var(--color-text-secondary);
+		font-size: 0.95rem;
+	}
+
+	.pricing-cards {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 2rem;
+	}
+
+	.price-card {
+		background: #161616;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		padding: 2.25rem 1.75rem;
+		display: flex;
+		flex-direction: column;
+		position: relative;
+	}
+
+	.price-card.featured {
+		border-color: var(--color-accent);
+		background: #1b1916;
+		box-shadow: 0 10px 40px rgba(201, 169, 110, 0.1);
+	}
+
+	.badge-pop {
+		position: absolute;
+		top: -12px;
+		left: 50%;
+		transform: translateX(-50%);
+		background: var(--color-accent);
+		color: #111;
+		font-family: var(--font-mono);
+		font-size: 0.65rem;
+		font-weight: 700;
+		padding: 3px 12px;
+		border-radius: var(--radius-full);
+	}
+
+	.tier-name {
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-accent);
+	}
+
+	.tier-price {
+		font-family: var(--font-heading);
+		font-size: 2.8rem;
+		color: #fff;
+		margin: 0.75rem 0;
+	}
+
+	.tier-price span {
+		font-size: 1.25rem;
+		color: var(--color-muted);
+	}
+
+	.tier-desc {
+		font-size: 0.85rem;
+		color: var(--color-text-secondary);
+		line-height: 1.5;
+		margin-bottom: 1.5rem;
+	}
+
+	.tier-features {
+		list-style: none;
+		padding: 0;
+		margin: 0 0 2rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		font-size: 0.85rem;
+		color: var(--color-text-secondary);
+	}
+
+	.tier-features li {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.tier-btn {
+		margin-top: auto;
+		display: block;
+		text-align: center;
+		padding: 0.75rem;
+		border-radius: var(--radius);
+		border: 1px solid var(--color-border-strong);
+		color: var(--color-text);
+		text-decoration: none;
+		font-size: 0.85rem;
+		font-weight: 500;
+		transition: all 0.2s ease;
+	}
+
+	.tier-btn:hover {
+		border-color: var(--color-accent);
+		color: var(--color-accent);
+	}
+
+	.tier-btn.primary {
+		background: var(--color-accent);
+		color: #111;
+		border-color: var(--color-accent);
+		font-weight: 600;
+	}
+
+	.tier-btn.primary:hover {
+		background: var(--color-accent-light);
+		color: #111;
+	}
+</style>

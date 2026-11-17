@@ -1,0 +1,214 @@
+---
+// Inquiry & Reservation Form component inspired by Dixon Creative & Shelley B Photography
+---
+
+<section id="inquire" class="inquire-section">
+	<div class="inquire-wrapper">
+		<div class="inquire-header">
+			<span class="section-badge">SESSION INQUIRY</span>
+			<h2 class="inquire-title">Reserve Your Golden Hour Date</h2>
+			<p class="inquire-intro">
+				Whether you're planning your family beach vacation to Gulf Shores or Orange Beach, or celebrating a senior milestone in Pensacola, fill out the form below. We'll reply within 24 hours with exact availability.
+			</p>
+		</div>
+
+		<form class="inquire-form" action="mailto:shelley@shelleybphotography.com" method="GET">
+			<div class="form-grid">
+				<div class="form-group">
+					<label for="name">Your Name</label>
+					<input type="text" id="name" name="name" required placeholder="First & Last Name" />
+				</div>
+
+				<div class="form-group">
+					<label for="email">Email Address</label>
+					<input type="email" id="email" name="email" required placeholder="hello@example.com" />
+				</div>
+
+				<div class="form-group">
+					<label for="phone">Phone Number</label>
+					<input type="tel" id="phone" name="phone" placeholder="(850) 490-5147" />
+				</div>
+
+				<div class="form-group">
+					<label for="location">Preferred Location / Beach</label>
+					<select id="location" name="location">
+						<option value="Gulf Shores, AL">Gulf Shores, AL</option>
+						<option value="Orange Beach, AL">Orange Beach, AL</option>
+						<option value="Pensacola Beach, FL">Pensacola Beach, FL</option>
+						<option value="Perdido Key, FL">Perdido Key, FL</option>
+						<option value="Destin / 30A, FL">Destin / 30A, FL</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="session_type">Session Type</label>
+					<select id="session_type" name="session_type">
+						<option value="Golden Hour Beach Family">Golden Hour Sunset Beach Family</option>
+						<option value="Sunrise Petite Beach Family">Sunrise Petite Beach Family</option>
+						<option value="Extended Multi-Gen Family">Multi-Gen Extended Family (10+)</option>
+						<option value="Senior / Sports Milestone">Senior Milestone / Sports Portrait</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="vacation_dates">Vacation / Preferred Dates</label>
+					<input type="text" id="vacation_dates" name="dates" placeholder="e.g. June 14–21, 2026" />
+				</div>
+
+				<div class="form-group full-width">
+					<label for="message">Family Details / Special Requests</label>
+					<textarea id="message" name="body" rows="4" placeholder="Tell us about how many family members, children's ages, or any questions..."></textarea>
+				</div>
+			</div>
+
+			<div class="form-footer">
+				<button type="submit" class="submit-btn">
+					<span>Send Inquiry</span>
+					<span class="arrow">→</span>
+				</button>
+				<p class="privacy-note">Direct to shelley@shelleybphotography.com · No spam, ever.</p>
+			</div>
+		</form>
+	</div>
+</section>
+
+<style>
+	.inquire-section {
+		max-width: var(--frame-width);
+		margin-inline: auto;
+		padding-inline: var(--page-margin);
+		padding-block: var(--section-gap);
+	}
+
+	.inquire-wrapper {
+		background: radial-gradient(circle at 50% 0%, rgba(201, 169, 110, 0.08) 0%, rgba(22, 22, 22, 0.8) 100%);
+		border: 1px solid rgba(201, 169, 110, 0.3);
+		border-radius: var(--radius);
+		padding: clamp(2rem, 5vw, 4.5rem);
+		box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+	}
+
+	.inquire-header {
+		text-align: center;
+		max-width: 600px;
+		margin-inline: auto;
+		margin-bottom: 3rem;
+	}
+
+	.section-badge {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.15em;
+		color: var(--color-accent);
+		text-transform: uppercase;
+		display: block;
+		margin-bottom: 0.5rem;
+	}
+
+	.inquire-title {
+		font-family: var(--font-heading);
+		font-size: clamp(2.2rem, 3.8vw, 3.4rem);
+		margin: 0.5rem 0 1rem;
+		color: var(--color-text);
+	}
+
+	.inquire-intro {
+		color: var(--color-text-secondary);
+		font-size: 0.95rem;
+		line-height: 1.6;
+	}
+
+	.inquire-form {
+		max-width: 780px;
+		margin-inline: auto;
+	}
+
+	.form-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1.5rem;
+	}
+
+	.form-group {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.form-group.full-width {
+		grid-column: 1 / -1;
+	}
+
+	label {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-text-secondary);
+	}
+
+	input, select, textarea {
+		background: rgba(0, 0, 0, 0.35);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		padding: 0.75rem 1rem;
+		color: #fff;
+		font-family: var(--font-body);
+		font-size: 0.95rem;
+		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	input:focus, select:focus, textarea:focus {
+		outline: none;
+		border-color: var(--color-accent);
+		box-shadow: 0 0 10px rgba(201, 169, 110, 0.25);
+	}
+
+	select option {
+		background: #1c1c1c;
+		color: #fff;
+	}
+
+	.form-footer {
+		margin-top: 2rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.submit-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75rem;
+		background: var(--color-accent);
+		color: #111;
+		font-family: var(--font-body);
+		font-size: 1rem;
+		font-weight: 600;
+		padding: 0.9rem 2.5rem;
+		border: 0;
+		border-radius: var(--radius);
+		cursor: pointer;
+		transition: background 0.2s ease, transform 0.2s ease;
+	}
+
+	.submit-btn:hover {
+		background: var(--color-accent-light);
+		transform: translateY(-2px);
+	}
+
+	.privacy-note {
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		color: var(--color-muted);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	@media (max-width: 650px) {
+		.form-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

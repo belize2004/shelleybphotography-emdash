@@ -1,0 +1,406 @@
+---
+// Interactive Masonry Gallery lookbook inspired by Dixon Creative & populated with Shelley B Photography photos
+import photos from "../data/shelley-photos.json";
+
+const categories = ["All", "Gulf Shores", "Orange Beach & Pensacola", "Perdido Key"];
+---
+
+<section id="lookbook" class="lookbook-section">
+	<div class="lookbook-header">
+		<div class="lookbook-intro">
+			<span class="section-badge">SESSION LOOKBOOK · 2026</span>
+			<h2 class="section-title">The Coast Collection</h2>
+			<p class="section-desc">
+				Browse authentic moments captured across Alabama and Florida’s Emerald Coast. 
+				From sugar-white sand dunes to dramatic golden hour backlight.
+			</p>
+		</div>
+
+		<!-- Category Filter Pills -->
+		<div class="filter-bar" role="tablist" aria-label="Filter gallery by location">
+			{
+				categories.map((cat, idx) => (
+					<button
+						type="button"
+						class={`filter-pill ${idx === 0 ? "active" : ""}`}
+						data-filter={cat === "All" ? "all" : cat}
+					>
+						{cat}
+					</button>
+				))
+			}
+		</div>
+	</div>
+
+	<!-- Gallery Grid -->
+	<div class="gallery-grid" id="masonry-grid">
+		{
+			photos.slice(0, 32).map((photo) => (
+				<article class="gallery-item" data-category={photo.category}>
+					<div class="photo-card">
+						<img
+							src={photo.src}
+							alt={photo.alt}
+							loading="lazy"
+							class="photo-img"
+						/>
+						<div class="photo-overlay">
+							<div class="photo-meta">
+								<span class="photo-location">{photo.location}</span>
+								<span class="photo-tag">Golden Hour Session</span>
+							</div>
+							<div class="photo-action">
+								<button type="button" class="zoom-btn" data-src={photo.src} data-alt={photo.alt} aria-label="View photo">
+									<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+									</svg>
+								</button>
+							</div>
+						</div>
+					</div>
+				</article>
+			))
+		}
+	</div>
+
+	<div class="gallery-footer">
+		<p class="counter-text">Showing curated selections from 100+ beach sessions</p>
+		<a href="#inquire" class="lookbook-cta">Inquire About Your Date <span>→</span></a>
+	</div>
+
+	<!-- Lightbox Modal -->
+	<div id="photo-lightbox" class="lightbox" hidden aria-hidden="true" role="dialog">
+		<div class="lightbox-backdrop"></div>
+		<div class="lightbox-dialog">
+			<button type="button" class="lightbox-close" aria-label="Close photo">✕</button>
+			<img id="lightbox-img" src="" alt="" class="lightbox-full-img" />
+			<p id="lightbox-caption" class="lightbox-caption"></p>
+		</div>
+	</div>
+</section>
+
+<script>
+	// Interactive Filter & Lightbox logic
+	const filterButtons = document.querySelectorAll(".filter-pill");
+	const galleryItems = document.querySelectorAll(".gallery-item");
+
+	filterButtons.forEach((btn) => {
+		btn.addEventListener("click", () => {
+			filterButtons.forEach((b) => b.classList.remove("active"));
+			btn.classList.add("active");
+			const target = btn.getAttribute("data-filter");
+
+			galleryItems.forEach((item) => {
+				const itemCat = item.getAttribute("data-category");
+				if (target === "all" || itemCat === target) {
+					(item as HTMLElement).style.display = "block";
+				} else {
+					(item as HTMLElement).style.display = "none";
+				}
+			});
+		});
+	});
+
+	// Also support clicks from Masthead strip
+	document.querySelectorAll(".session-strip-item").forEach((strip) => {
+		strip.addEventListener("click", (e) => {
+			const filter = strip.getAttribute("data-filter");
+			if (!filter) return;
+			const targetBtn = Array.from(filterButtons).find(
+				(b) => b.getAttribute("data-filter") === filter
+			);
+			if (targetBtn) {
+				(targetBtn as HTMLButtonElement).click();
+			}
+		});
+	});
+
+	// Lightbox
+	const lightbox = document.getElementById("photo-lightbox");
+	const lightboxImg = document.getElementById("lightbox-img") as HTMLImageElement;
+	const lightboxCaption = document.getElementById("lightbox-caption");
+	const closeBtn = document.querySelector(".lightbox-close");
+	const backdrop = document.querySelector(".lightbox-backdrop");
+
+	document.querySelectorAll(".zoom-btn").forEach((btn) => {
+		btn.addEventListener("click", () => {
+			const src = btn.getAttribute("data-src");
+			const alt = btn.getAttribute("data-alt");
+			if (lightbox && lightboxImg && src) {
+				lightboxImg.src = src;
+				lightboxImg.alt = alt || "Shelley B Photography";
+				if (lightboxCaption) lightboxCaption.textContent = alt || "";
+				lightbox.hidden = false;
+				lightbox.setAttribute("aria-hidden", "false");
+				document.body.style.overflow = "hidden";
+			}
+		});
+	});
+
+	function closeLightbox() {
+		if (lightbox) {
+			lightbox.hidden = true;
+			lightbox.setAttribute("aria-hidden", "true");
+			document.body.style.overflow = "";
+		}
+	}
+
+	closeBtn?.addEventListener("click", closeLightbox);
+	backdrop?.addEventListener("click", closeLightbox);
+	window.addEventListener("keydown", (e) => {
+		if (e.key === "Escape") closeLightbox();
+	});
+</script>
+
+<style>
+	.lookbook-section {
+		max-width: var(--frame-width);
+		margin-inline: auto;
+		padding-inline: var(--page-margin);
+		padding-block: var(--section-gap);
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.lookbook-header {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+		margin-bottom: 3rem;
+	}
+
+	.section-badge {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.15em;
+		color: var(--color-accent);
+		text-transform: uppercase;
+		display: inline-block;
+		margin-bottom: 0.5rem;
+	}
+
+	.section-title {
+		font-family: var(--font-heading);
+		font-size: clamp(2.2rem, 4vw, 3.5rem);
+		font-weight: 400;
+		margin: 0;
+		color: var(--color-text);
+	}
+
+	.section-desc {
+		max-width: 54ch;
+		color: var(--color-text-secondary);
+		font-size: 1rem;
+		line-height: 1.6;
+		margin-top: 0.5rem;
+	}
+
+	.filter-bar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		padding-top: 1rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.filter-pill {
+		background: rgba(255, 255, 255, 0.04);
+		color: var(--color-text-secondary);
+		border: 1px solid var(--color-border);
+		padding: 0.5rem 1.25rem;
+		border-radius: var(--radius-full);
+		font-size: 0.85rem;
+		font-family: var(--font-body);
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.filter-pill:hover {
+		border-color: var(--color-accent);
+		color: var(--color-text);
+	}
+
+	.filter-pill.active {
+		background: var(--color-accent);
+		color: #111;
+		font-weight: 600;
+		border-color: var(--color-accent);
+	}
+
+	/* Masonry Grid */
+	.gallery-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		gap: 1.5rem;
+	}
+
+	.gallery-item {
+		transition: transform 0.3s ease;
+	}
+
+	.photo-card {
+		position: relative;
+		border-radius: var(--radius);
+		overflow: hidden;
+		background: #181818;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		aspect-ratio: 4 / 5;
+	}
+
+	.photo-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+	}
+
+	.photo-card:hover .photo-img {
+		transform: scale(1.05);
+	}
+
+	.photo-overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.2) 50%, transparent 100%);
+		opacity: 0;
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		padding: 1.25rem;
+		transition: opacity 0.3s ease;
+	}
+
+	.photo-card:hover .photo-overlay {
+		opacity: 1;
+	}
+
+	.photo-meta {
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+	}
+
+	.photo-location {
+		font-family: var(--font-heading);
+		font-size: 1.15rem;
+		color: #fff;
+	}
+
+	.photo-tag {
+		font-family: var(--font-mono);
+		font-size: 0.65rem;
+		letter-spacing: 0.1em;
+		color: var(--color-accent);
+		text-transform: uppercase;
+	}
+
+	.zoom-btn {
+		background: rgba(255, 255, 255, 0.15);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		color: #fff;
+		border-radius: 50%;
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		backdrop-filter: blur(4px);
+		transition: background 0.2s ease, transform 0.2s ease;
+	}
+
+	.zoom-btn:hover {
+		background: var(--color-accent);
+		color: #111;
+		transform: scale(1.1);
+	}
+
+	.gallery-footer {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.5rem;
+		margin-top: 3rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.counter-text {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		color: var(--color-muted);
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+
+	.lookbook-cta {
+		font-weight: 500;
+		color: var(--color-accent);
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.lookbook-cta:hover {
+		text-decoration: underline;
+	}
+
+	/* Lightbox */
+	.lightbox {
+		position: fixed;
+		inset: 0;
+		z-index: 1000;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 2rem;
+	}
+
+	.lightbox[hidden] {
+		display: none;
+	}
+
+	.lightbox-backdrop {
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.92);
+		backdrop-filter: blur(10px);
+	}
+
+	.lightbox-dialog {
+		position: relative;
+		z-index: 1;
+		max-width: 90vw;
+		max-height: 85vh;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.lightbox-close {
+		position: absolute;
+		top: -45px;
+		right: 0;
+		background: none;
+		border: 0;
+		color: #fff;
+		font-size: 1.5rem;
+		cursor: pointer;
+	}
+
+	.lightbox-full-img {
+		max-width: 100%;
+		max-height: 75vh;
+		object-fit: contain;
+		border-radius: var(--radius);
+		box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+	}
+
+	.lightbox-caption {
+		color: var(--color-text-secondary);
+		margin-top: 1rem;
+		font-size: 0.9rem;
+		font-family: var(--font-body);
+	}
+</style>
