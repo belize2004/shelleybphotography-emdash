@@ -40,7 +40,6 @@
 		}
 	});
 
-	// Close drawer on link click
 	drawer?.querySelectorAll("a").forEach((link) => {
 		link.addEventListener("click", () => {
 			if (drawer) drawer.hidden = true;
@@ -58,7 +57,7 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 1.25rem var(--page-margin);
-		background: rgba(17, 17, 17, 0.85);
+		background: rgba(17, 17, 17, 0.95);
 		backdrop-filter: blur(12px);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 		max-width: 100%;
@@ -120,6 +119,11 @@
 	.menubutton svg {
 		width: 24px;
 		height: 24px;
+	}
+
+	/* Hidden attribute support */
+	.mobilemenu[hidden] {
+		display: none !important;
 	}
 
 	.mobilemenu {
