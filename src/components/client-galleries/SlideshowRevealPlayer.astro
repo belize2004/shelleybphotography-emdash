@@ -1,0 +1,528 @@
+---
+interface SlideArtwork {
+  id: string;
+  title: string;
+  imageUrl: string;
+  width?: number;
+  height?: number;
+}
+
+interface Props {
+  galleryId: string;
+  galleryTitle: string;
+  artistName: string;
+  artworks: SlideArtwork[];
+  musicTrack?: string | null;
+  enabled?: boolean;
+}
+
+const {
+  galleryId,
+  galleryTitle,
+  artistName,
+  artworks = [],
+  musicTrack = "cinematic_strings",
+  enabled = true,
+} = Astro.props;
+
+if (!enabled || artworks.length === 0) {
+  return null;
+}
+---
+
+<div
+  id="lumio-slideshow-reveal"
+  class="lumio-slideshow-reveal"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Gallery Reveal Slideshow"
+  hidden
+  data-gallery-id={galleryId}
+  data-music-track={musicTrack || "cinematic_strings"}
+>
+  <div class="slideshow-backdrop"></div>
+
+  <!-- Top Bar Controls -->
+  <header class="slideshow-header">
+    <div class="slideshow-header-info">
+      <p class="slideshow-eyebrow">The Emotional Reveal</p>
+      <h2 class="slideshow-title">{galleryTitle}</h2>
+      <span class="slideshow-artist">by {artistName}</span>
+    </div>
+    <div class="slideshow-header-actions">
+      <button type="button" class="slideshow-ctrl-btn sound-btn" id="slideshow-sound-toggle" aria-label="Toggle Ambiance Audio">
+        <span class="sound-icon-on" aria-hidden="true">♪</span>
+        <span class="sound-icon-off" aria-hidden="true">✕</span>
+        <span class="sound-label">Ambiance</span>
+      </button>
+      <button type="button" class="slideshow-ctrl-btn exit-btn" id="slideshow-exit-btn" aria-label="Exit Slideshow and View Gallery">
+        <span>View Gallery Grid</span>
+        <span class="exit-icon" aria-hidden="true">→</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Slide Stage -->
+  <div class="slideshow-stage" id="slideshow-stage">
+    {artworks.map((art, index) => (
+      <div
+        class:list={["slideshow-slide", index === 0 && "is-active"]}
+        data-slide-index={index}
+        data-artwork-id={art.id}
+        data-title={art.title}
+        aria-hidden={index === 0 ? "false" : "true"}
+      >
+        <div class="slide-image-wrapper">
+          <img
+            src={art.imageUrl}
+            alt={art.title}
+            loading={index < 2 ? "eager" : "lazy"}
+            class="slide-image"
+          />
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Bottom Navigation & Favoriting Bar -->
+  <footer class="slideshow-footer">
+    <div class="slideshow-footer-info">
+      <span class="slide-counter" id="slideshow-counter">1 / {artworks.length}</span>
+      <h3 class="slide-current-title" id="slideshow-current-title">{artworks[0]?.title}</h3>
+    </div>
+
+    <div class="slideshow-footer-controls">
+      <button type="button" class="slideshow-nav-btn prev" id="slideshow-prev-btn" aria-label="Previous Portrait">
+        ‹
+      </button>
+      <button type="button" class="slideshow-nav-btn play-pause" id="slideshow-play-toggle" aria-label="Pause Slideshow">
+        <span class="icon-pause">❚❚</span>
+        <span class="icon-play" hidden>▶</span>
+      </button>
+      <button type="button" class="slideshow-nav-btn next" id="slideshow-next-btn" aria-label="Next Portrait">
+        ›
+      </button>
+      <div class="slideshow-fav-wrap">
+        <button
+          type="button"
+          class="slideshow-fav-btn"
+          id="slideshow-fav-btn"
+          data-artwork-id={artworks[0]?.id}
+          aria-label="Add to Favorites"
+          aria-pressed="false"
+        >
+          <span class="fav-heart" aria-hidden="true">♥</span>
+          <span class="fav-label">Favorite</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<style>
+  .lumio-slideshow-reveal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #08090b;
+    color: #f3f4f6;
+    overflow: hidden;
+    user-select: none;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .lumio-slideshow-reveal[hidden] {
+    display: none !important;
+  }
+
+  .slideshow-backdrop {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(18, 22, 28, 0.4) 0%, rgba(8, 9, 11, 0.95) 100%);
+    pointer-events: none;
+  }
+
+  .slideshow-header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 32px;
+    background: linear-gradient(to bottom, rgba(8, 9, 11, 0.85) 0%, transparent 100%);
+  }
+
+  .slideshow-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #a57a55;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  .slideshow-title {
+    font-family: Georgia, Cambria, serif;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    margin: 0;
+    color: #ffffff;
+  }
+
+  .slideshow-artist {
+    font-size: 13px;
+    color: #9ca3af;
+    margin-left: 6px;
+  }
+
+  .slideshow-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .slideshow-ctrl-btn {
+    appearance: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    color: #f3f4f6;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .slideshow-ctrl-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .slideshow-ctrl-btn.exit-btn {
+    background: #ffffff;
+    color: #0b0f15;
+    border-color: #ffffff;
+    font-weight: 600;
+  }
+
+  .slideshow-ctrl-btn.exit-btn:hover {
+    background: #e5e7eb;
+  }
+
+  .slideshow-stage {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .slideshow-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .slideshow-slide.is-active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .slide-image-wrapper {
+    width: 90vw;
+    height: 72vh;
+    max-width: 1200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 2px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    transform: scale(1);
+    transition: transform 6s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .slideshow-slide.is-active .slide-image {
+    transform: scale(1.05);
+  }
+
+  .slideshow-footer {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 32px;
+    background: linear-gradient(to top, rgba(8, 9, 11, 0.85) 0%, transparent 100%);
+  }
+
+  .slideshow-footer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .slide-counter {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: #9ca3af;
+  }
+
+  .slide-current-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+    color: #f9fafb;
+  }
+
+  .slideshow-footer-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .slideshow-nav-btn {
+    appearance: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .slideshow-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+  }
+
+  .slideshow-nav-btn.play-pause {
+    font-size: 14px;
+  }
+
+  .slideshow-fav-btn {
+    appearance: none;
+    border: 1px solid rgba(225, 29, 72, 0.3);
+    background: rgba(225, 29, 72, 0.12);
+    color: #f43f5e;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .slideshow-fav-btn:hover,
+  .slideshow-fav-btn.is-favorited {
+    background: #e11d48;
+    color: #ffffff;
+    border-color: #e11d48;
+    transform: scale(1.03);
+  }
+
+  @media (max-width: 768px) {
+    .slideshow-header, .slideshow-footer {
+      padding: 16px 20px;
+    }
+    .slideshow-title {
+      font-size: 16px;
+    }
+    .slide-image-wrapper {
+      width: 95vw;
+      height: 65vh;
+    }
+    .slideshow-footer {
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      text-align: center;
+    }
+  }
+</style>
+
+<script is:inline define:vars={{ galleryId, autoAdvanceMs: 5000 }}>
+  (function () {
+    const modal = document.getElementById("lumio-slideshow-reveal");
+    if (!modal) return;
+
+    const slides = Array.from(modal.querySelectorAll(".slideshow-slide"));
+    if (slides.length === 0) return;
+
+    let currentIndex = 0;
+    let isPlaying = true;
+    let timer = null;
+
+    const counterEl = document.getElementById("slideshow-counter");
+    const titleEl = document.getElementById("slideshow-current-title");
+    const prevBtn = document.getElementById("slideshow-prev-btn");
+    const nextBtn = document.getElementById("slideshow-next-btn");
+    const playToggle = document.getElementById("slideshow-play-toggle");
+    const favBtn = document.getElementById("slideshow-fav-btn");
+    const exitBtn = document.getElementById("slideshow-exit-btn");
+    const playIcon = playToggle?.querySelector(".icon-play");
+    const pauseIcon = playToggle?.querySelector(".icon-pause");
+
+    function updateSlide(newIndex) {
+      slides[currentIndex]?.classList.remove("is-active");
+      slides[currentIndex]?.setAttribute("aria-hidden", "true");
+
+      currentIndex = (newIndex + slides.length) % slides.length;
+
+      const activeSlide = slides[currentIndex];
+      activeSlide.classList.add("is-active");
+      activeSlide.setAttribute("aria-hidden", "false");
+
+      const artworkId = activeSlide.getAttribute("data-artwork-id");
+      const title = activeSlide.getAttribute("data-title") || "";
+
+      if (counterEl) counterEl.textContent = `${currentIndex + 1} / ${slides.length}`;
+      if (titleEl) titleEl.textContent = title;
+      if (favBtn && artworkId) {
+        favBtn.setAttribute("data-artwork-id", artworkId);
+        // Check if favorited in window set
+        const gridFavBtn = document.querySelector(`[data-favorite-btn][data-artwork-id="${artworkId}"]`);
+        const isFav = gridFavBtn && gridFavBtn.classList.contains("is-favorited");
+        if (isFav) {
+          favBtn.classList.add("is-favorited");
+          favBtn.setAttribute("aria-pressed", "true");
+        } else {
+          favBtn.classList.remove("is-favorited");
+          favBtn.setAttribute("aria-pressed", "false");
+        }
+      }
+    }
+
+    function nextSlide() {
+      updateSlide(currentIndex + 1);
+    }
+
+    function prevSlide() {
+      updateSlide(currentIndex - 1);
+    }
+
+    function startTimer() {
+      stopTimer();
+      if (isPlaying) {
+        timer = setInterval(nextSlide, autoAdvanceMs);
+      }
+    }
+
+    function stopTimer() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        if (playIcon) playIcon.hidden = true;
+        if (pauseIcon) pauseIcon.hidden = false;
+        startTimer();
+      } else {
+        if (playIcon) playIcon.hidden = false;
+        if (pauseIcon) pauseIcon.hidden = true;
+        stopTimer();
+      }
+    }
+
+    function openSlideshow() {
+      modal.hidden = false;
+      document.body.style.overflow = "hidden";
+      currentIndex = 0;
+      updateSlide(0);
+      isPlaying = true;
+      startTimer();
+    }
+
+    function closeSlideshow() {
+      stopTimer();
+      modal.hidden = true;
+      document.body.style.overflow = "";
+      const mosaic = document.querySelector(".paul-photo-mosaic");
+      if (mosaic) {
+        mosaic.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    prevBtn?.addEventListener("click", () => {
+      prevSlide();
+      startTimer();
+    });
+
+    nextBtn?.addEventListener("click", () => {
+      nextSlide();
+      startTimer();
+    });
+
+    playToggle?.addEventListener("click", togglePlay);
+    exitBtn?.addEventListener("click", closeSlideshow);
+
+    favBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const artworkId = favBtn.getAttribute("data-artwork-id");
+      if (artworkId) {
+        // Trigger favorite toggle in gallery
+        const gridFavBtn = document.querySelector(`[data-favorite-btn][data-artwork-id="${artworkId}"]`);
+        if (gridFavBtn) {
+          gridFavBtn.click();
+          const isNowFav = favBtn.classList.toggle("is-favorited");
+          favBtn.setAttribute("aria-pressed", isNowFav ? "true" : "false");
+        }
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (modal.hidden) return;
+      if (e.key === "Escape") closeSlideshow();
+      if (e.key === "ArrowRight") { nextSlide(); startTimer(); }
+      if (e.key === "ArrowLeft") { prevSlide(); startTimer(); }
+      if (e.key === " ") { e.preventDefault(); togglePlay(); }
+    });
+
+    // Expose openSlideshow globally for [Play Reveal] buttons
+    window.openGalleryRevealSlideshow = openSlideshow;
+
+    // Check if auto-launch requested via query param ?reveal=1
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("reveal") === "1") {
+      openSlideshow();
+    }
+  })();
+</script>

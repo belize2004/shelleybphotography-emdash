@@ -1,0 +1,572 @@
+---
+// 3-Column Luxury Lookbook Card Grid matching Dixon Creative exactly
+import collections from "../data/shelley-collections.json";
+import photos from "../data/shelley-photos.json";
+
+const categories = ["All Sessions", "Beach Family", "Seniors", "Published Luxury", "Dunes & Coastal"];
+---
+
+<section class="portfolio wrap" id="specialties">
+	<div class="lookbook-controls">
+		<div class="lookbook-tabs">
+			<button class="lookbook-tab active" data-tab="specialties">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+					<rect width="7" height="7" x="3" y="3" rx="1"></rect>
+					<rect width="7" height="7" x="14" y="3" rx="1"></rect>
+					<rect width="7" height="7" x="14" y="14" rx="1"></rect>
+					<rect width="7" height="7" x="3" y="14" rx="1"></rect>
+				</svg>
+				<span>STUDIO COLLECTIONS ({collections.length})</span>
+			</button>
+			<button class="lookbook-tab" data-tab="portraits">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+					<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+				</svg>
+				<span>ALL PORTFOLIO HIGHLIGHTS ({photos.length})</span>
+			</button>
+		</div>
+
+		<button class="inspiration" id="inspiration-btn" aria-pressed="false">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+				<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+			</svg>
+			<span>Saved Inspiration</span>
+			<b id="savecount">0</b>
+		</button>
+	</div>
+
+	<!-- Category Filter Bar -->
+	<div class="filterbar" role="group" aria-label="Filter shoot collections">
+		{
+			categories.map((cat, idx) => (
+				<button
+					type="button"
+					data-filter={cat}
+					class={idx === 0 ? "current" : ""}
+					aria-pressed={idx === 0 ? "true" : "false"}
+				>
+					{cat}
+				</button>
+			))
+		}
+	</div>
+
+	<div class="resultline">
+		<span id="resultcount">{collections.length} shoot collections to explore</span>
+		<span>SELECT ANY COLLECTION TO OPEN ITS COMPLETE PHOTO GRID ↗</span>
+	</div>
+
+	<!-- 3-Column Luxury Lookbook Card Grid -->
+	<div class="lookbook-grid" id="specialties-grid">
+		{
+			collections.map((item) => (
+				<article class="lookbook-card" data-category={item.category}>
+					<!-- Card Header -->
+					<div class="card-topline">
+						<div class="card-series-tag">
+							<span class="series-num">{item.vol}</span>
+							<span class="series-sep">·</span>
+							<span class="series-badge">{item.badge}</span>
+						</div>
+						<span class="card-location">{item.location}</span>
+					</div>
+
+					<!-- 4:5 Photo Frame with Direct Click to Gallery -->
+					<a class="card-photo-frame" href={item.url} aria-label={`View ${item.title} photo grid`}>
+						<img
+							src={item.thumb}
+							alt={item.title}
+							width="480"
+							height="600"
+							loading="lazy"
+						/>
+						<div class="frame-hover-shade">
+							<div class="hover-cta-pill">
+								<span>Explore {item.count}</span>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M4 12h15m-6-6 6 6-6 6"></path>
+								</svg>
+							</div>
+						</div>
+					</a>
+
+					<!-- Card Bottom Editorial Details -->
+					<div class="card-editorial-body">
+						<div class="card-headline-row">
+							<h3 class="card-title">
+								<a href={item.url}>{item.title}</a>
+							</h3>
+							<button class="favorite-star-btn" data-save-id={item.vol} aria-label="Save to inspiration">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+									<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+								</svg>
+							</button>
+						</div>
+
+						<p class="card-narrative">{item.narrative}</p>
+
+						<div class="card-action-bar">
+							<a class="card-grid-btn" href={item.url}>
+								View Photo Grid <span>↗</span>
+							</a>
+							<a class="card-quick-detail-btn" href="#inquire">
+								Session Info
+							</a>
+						</div>
+					</div>
+				</article>
+			))
+		}
+	</div>
+
+	<!-- Highlights Grid (Hidden by default, shown when tab is switched) -->
+	<div class="lookbook-grid" id="portraits-grid" style="display: none;">
+		{
+			photos.slice(0, 24).map((p) => (
+				<article class="lookbook-card" data-category="Portraits">
+					<div class="card-topline">
+						<span class="series-badge">HIGHLIGHT</span>
+						<span class="card-location">{p.location}</span>
+					</div>
+					<div class="card-photo-frame">
+						<img src={p.src} alt={p.alt} loading="lazy" />
+					</div>
+					<div class="card-editorial-body">
+						<h3 class="card-title">{p.alt}</h3>
+						<p class="card-narrative">{p.location} — Golden hour natural light.</p>
+					</div>
+				</article>
+			))
+		}
+	</div>
+</section>
+
+<script>
+	// Tab switching & filter bar
+	const tabs = document.querySelectorAll(".lookbook-tab");
+	const specGrid = document.getElementById("specialties-grid");
+	const portGrid = document.getElementById("portraits-grid");
+	const filterBtns = document.querySelectorAll(".filterbar button");
+	const cards = document.querySelectorAll("#specialties-grid .lookbook-card");
+	const resultCount = document.getElementById("resultcount");
+
+	tabs.forEach((tab) => {
+		tab.addEventListener("click", () => {
+			tabs.forEach((t) => t.classList.remove("active"));
+			tab.classList.add("active");
+			const target = tab.getAttribute("data-tab");
+			if (target === "specialties") {
+				if (specGrid) specGrid.style.display = "grid";
+				if (portGrid) portGrid.style.display = "none";
+			} else {
+				if (specGrid) specGrid.style.display = "none";
+				if (portGrid) portGrid.style.display = "grid";
+			}
+		});
+	});
+
+	filterBtns.forEach((btn) => {
+		btn.addEventListener("click", () => {
+			filterBtns.forEach((b) => {
+				b.classList.remove("current");
+				b.setAttribute("aria-pressed", "false");
+			});
+			btn.classList.add("current");
+			btn.setAttribute("aria-pressed", "true");
+			const cat = btn.getAttribute("data-filter");
+
+			let count = 0;
+			cards.forEach((card) => {
+				const itemCat = card.getAttribute("data-category");
+				if (cat === "All Sessions" || itemCat === cat) {
+					(card as HTMLElement).style.display = "flex";
+					count++;
+				} else {
+					(card as HTMLElement).style.display = "none";
+				}
+			});
+
+			if (resultCount) {
+				resultCount.textContent = `${count} shoot collections to explore`;
+			}
+		});
+	});
+
+	// Star / Save logic
+	const starBtns = document.querySelectorAll(".favorite-star-btn");
+	const saveCountEl = document.getElementById("savecount");
+	let saved = 0;
+	starBtns.forEach((btn) => {
+		btn.addEventListener("click", () => {
+			btn.classList.toggle("saved");
+			if (btn.classList.contains("saved")) {
+				saved++;
+			} else {
+				saved = Math.max(0, saved - 1);
+			}
+			if (saveCountEl) saveCountEl.textContent = String(saved);
+		});
+	});
+</script>
+
+<style>
+	.portfolio.wrap {
+		max-width: var(--frame-width);
+		margin-inline: auto;
+		padding-inline: var(--page-margin);
+		padding-block: clamp(2rem, 4vw, 4rem);
+	}
+
+	.lookbook-controls {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 1rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.lookbook-tabs {
+		display: flex;
+		gap: 0.75rem;
+		background: #141414;
+		padding: 4px;
+		border-radius: var(--radius-full);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.lookbook-tab {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: transparent;
+		color: #9e9e9e;
+		border: 0;
+		padding: 0.5rem 1.1rem;
+		border-radius: var(--radius-full);
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.08em;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.lookbook-tab svg {
+		width: 15px;
+		height: 15px;
+	}
+
+	.lookbook-tab.active {
+		background: rgba(255, 255, 255, 0.1);
+		color: #fff;
+	}
+
+	.inspiration {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: #141414;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: #bbb;
+		padding: 0.5rem 1rem;
+		border-radius: var(--radius-full);
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		cursor: pointer;
+	}
+
+	.inspiration svg {
+		width: 14px;
+		height: 14px;
+	}
+
+	.inspiration b {
+		background: var(--color-accent);
+		color: #111;
+		padding: 1px 6px;
+		border-radius: 50%;
+		font-size: 0.65rem;
+	}
+
+	.filterbar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.filterbar button {
+		background: #141414;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: #999;
+		padding: 0.4rem 1rem;
+		border-radius: var(--radius-full);
+		font-family: var(--font-body);
+		font-size: 0.8rem;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.filterbar button:hover {
+		border-color: rgba(201, 169, 110, 0.5);
+		color: #fff;
+	}
+
+	.filterbar button.current {
+		background: var(--color-accent);
+		color: #111;
+		font-weight: 600;
+		border-color: var(--color-accent);
+	}
+
+	.resultline {
+		display: flex;
+		justify-content: space-between;
+		font-family: var(--font-mono);
+		font-size: 0.68rem;
+		color: #777;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		margin-bottom: 2rem;
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	}
+
+	/* 3-Column Luxury Lookbook Card Grid */
+	.lookbook-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 1.5rem;
+	}
+
+	.lookbook-card {
+		background: #151515;
+		border: 1px solid rgba(255, 255, 255, 0.07);
+		border-radius: 8px;
+		padding: 1rem;
+		display: flex;
+		flex-direction: column;
+		transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+	}
+
+	.lookbook-card:hover {
+		transform: translateY(-4px);
+		border-color: rgba(201, 169, 110, 0.35);
+		box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+	}
+
+	.card-topline {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-family: var(--font-mono);
+		font-size: 0.65rem;
+		color: #888;
+		text-transform: uppercase;
+		margin-bottom: 0.75rem;
+	}
+
+	.card-series-tag {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.series-num {
+		color: var(--color-accent);
+		font-weight: 600;
+	}
+
+	.series-badge {
+		background: rgba(255, 255, 255, 0.06);
+		padding: 1px 6px;
+		border-radius: 4px;
+		color: #ccc;
+	}
+
+	.card-location {
+		color: #777;
+	}
+
+	/* 4:5 Photo Frame */
+	.card-photo-frame {
+		position: relative;
+		display: block;
+		width: 100%;
+		aspect-ratio: 4 / 5;
+		border-radius: 6px;
+		overflow: hidden;
+		background: #1c1c1c;
+	}
+
+	.card-photo-frame img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+	}
+
+	.card-photo-frame:hover img {
+		transform: scale(1.04);
+	}
+
+	.frame-hover-shade {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 60%);
+		opacity: 0;
+		display: flex;
+		align-items: flex-end;
+		justify-content: center;
+		padding-bottom: 1.5rem;
+		transition: opacity 0.3s ease;
+	}
+
+	.card-photo-frame:hover .frame-hover-shade {
+		opacity: 1;
+	}
+
+	.hover-cta-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: var(--color-accent);
+		color: #111;
+		font-weight: 600;
+		font-size: 0.78rem;
+		padding: 0.5rem 1rem;
+		border-radius: var(--radius-full);
+	}
+
+	.hover-cta-pill svg {
+		width: 14px;
+		height: 14px;
+	}
+
+	/* Card Editorial Body */
+	.card-editorial-body {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		margin-top: 1rem;
+	}
+
+	.card-headline-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 0.5rem;
+	}
+
+	.card-title {
+		font-family: var(--font-heading);
+		font-size: 1.35rem;
+		margin: 0;
+		line-height: 1.2;
+	}
+
+	.card-title a {
+		color: #f0f0f0;
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.card-title a:hover {
+		color: var(--color-accent);
+	}
+
+	.favorite-star-btn {
+		background: none;
+		border: 0;
+		color: #666;
+		cursor: pointer;
+		padding: 2px;
+		transition: color 0.2s ease;
+	}
+
+	.favorite-star-btn svg {
+		width: 16px;
+		height: 16px;
+	}
+
+	.favorite-star-btn:hover,
+	.favorite-star-btn.saved {
+		color: var(--color-accent);
+	}
+
+	.favorite-star-btn.saved svg {
+		fill: var(--color-accent);
+	}
+
+	.card-narrative {
+		font-size: 0.82rem;
+		color: #9e9e9e;
+		line-height: 1.55;
+		margin: 0.6rem 0 1.25rem;
+		flex-grow: 1;
+	}
+
+	.card-action-bar {
+		display: flex;
+		gap: 0.5rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		padding-top: 0.85rem;
+	}
+
+	.card-grid-btn {
+		flex: 1;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.35rem;
+		background: #1e1e1e;
+		color: #e5e5e5;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 6px;
+		padding: 0.55rem;
+		font-size: 0.78rem;
+		font-weight: 500;
+		text-decoration: none;
+		transition: all 0.2s ease;
+	}
+
+	.card-grid-btn:hover {
+		background: #252525;
+		color: #fff;
+		border-color: rgba(201, 169, 110, 0.4);
+	}
+
+	.card-quick-detail-btn {
+		background: transparent;
+		color: #888;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 6px;
+		padding: 0.55rem 0.85rem;
+		font-size: 0.78rem;
+		cursor: pointer;
+		text-decoration: none;
+		transition: all 0.2s ease;
+	}
+
+	.card-quick-detail-btn:hover {
+		color: #fff;
+		border-color: rgba(255, 255, 255, 0.2);
+	}
+
+	@media (max-width: 1024px) {
+		.lookbook-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (max-width: 650px) {
+		.lookbook-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.resultline {
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+	}
+</style>

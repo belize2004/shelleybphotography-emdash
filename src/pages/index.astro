@@ -5,32 +5,19 @@ import {
 	getSeoMeta,
 	getSiteSettings,
 } from "emdash";
-import { PortableText } from "emdash/ui";
-import type { PageLayoutBlock } from "../../emdash-env";
 import Base from "../layouts/Base.astro";
-import EditorNote from "../components/EditorNote.astro";
-import PageBlocks from "../components/PageBlocks.astro";
+import SiteHeader from "../components/SiteHeader.astro";
 import EditorialMasthead from "../components/EditorialMasthead.astro";
-import LookbookGrid from "../components/LookbookGrid.astro";
+import DixonLookbookGrid from "../components/DixonLookbookGrid.astro";
 import ExperiencePricing from "../components/ExperiencePricing.astro";
 import InquiryForm from "../components/InquiryForm.astro";
-import { layoutDescription, startsWithHeading } from "../utils/page";
-import { getSelectedWork } from "../utils/selected-work";
 
-const [settings, homeResult, projectsResult] = await Promise.all([
+const [settings, homeResult] = await Promise.all([
 	getSiteSettings(),
 	getEmDashEntry("pages", "home"),
-	getSelectedWork(),
 ]);
 
 const home = homeResult.entry;
-if (Astro.cache?.enabled) {
-	if (homeResult.cacheHint) Astro.cache.set(homeResult.cacheHint);
-	if (projectsResult.cacheHint) Astro.cache.set(projectsResult.cacheHint);
-	if (!home) Astro.cache.set({ tags: ["pages"] });
-}
-
-const projects = projectsResult.entries || [];
 const siteTitle = settings?.title || "Shelley B Photography";
 
 const seo = home
@@ -39,44 +26,9 @@ const seo = home
 			path: "/",
 			defaultTitle: `${siteTitle} | Gulf Coast Family Beach & Senior Portraits`,
 			defaultDescription:
-				layoutDescription(home.data.layout) ??
 				"Luxury Gulf Coast beach portraits & editorial senior photography by Shelley & Blaine Bressman. Serving Pensacola Beach, Gulf Shores, and Orange Beach.",
 		})
 	: null;
-
-const defaultLayout: PageLayoutBlock[] = [
-	{
-		_type: "portfolio_statement",
-		_version: 1,
-		_key: "statement",
-		label: "Emerald Coast · Est. 2021",
-		text: "Luxury Gulf Coast beach portraits & editorial senior milestones by Shelley & Blaine Bressman. Published in The Wall Street Journal.",
-	},
-	{
-		_type: "portfolio_selected_work",
-		_version: 1,
-		_key: "selected-work",
-		heading: "Signature Collections",
-	},
-	{
-		_type: "portfolio_clients",
-		_version: 1,
-		_key: "clients",
-		heading: "Published In",
-		clients: [
-			{ name: "The Wall Street Journal" },
-			{ name: "Pensacola Magazine" },
-			{ name: "Gulf Shores Visitor Guide" },
-			{ name: "Orange Beach Concierge" },
-		],
-	},
-];
-
-const layout = home?.data.layout?.length ? home.data.layout : defaultLayout;
-const content = home?.data.content;
-const showContent = Boolean(
-	content && (content.length > 0 || getEditMeta(content)),
-);
 ---
 
 <Base
@@ -90,59 +42,18 @@ const showContent = Boolean(
 		? { collection: "pages", id: home.data.id, slug: home.id }
 		: undefined}
 >
-	<!-- Editorial Studio Masthead (Dixon Creative style) -->
+	<!-- Dixon Creative Luxury Site Header -->
+	<SiteHeader />
+
+	<!-- Editorial Studio Masthead Header & Session Strip -->
 	<EditorialMasthead />
 
-	<!-- Interactive Session Lookbook with Filter & Lightbox -->
-	<LookbookGrid />
+	<!-- Dixon Creative 3-Column Luxury Lookbook Card Grid -->
+	<DixonLookbookGrid />
 
-	<!-- CMS Selected Work & Editorial Layout from EmDash -->
-	<section id="sessions" class="cms-work-section">
-		<div class="frame">
-			<div class="section-lead-label">EMDASH CMS · CURATED PORTFOLIO</div>
-			<div class="home-layout" {...home?.edit.layout}>
-				<PageBlocks value={layout} />
-			</div>
-		</div>
-	</section>
-
-	{
-		showContent && (
-			<div class="frame prose prose-hang home-body" {...home?.edit.content}>
-				<PortableText value={content} />
-			</div>
-		)
-	}
-
-	<!-- Experience, Reviews & All-Inclusive Pricing -->
+	<!-- The Experience, Husband & Wife Bio, Reviews, and Pricing Collections -->
 	<ExperiencePricing />
 
-	<!-- Inquiry & Reservation Form -->
+	<!-- Session Inquiry / Booking Drawer Form -->
 	<InquiryForm />
 </Base>
-
-<style>
-	.cms-work-section {
-		padding-block: var(--section-gap);
-		border-bottom: 1px solid var(--color-border);
-	}
-
-	.section-lead-label {
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		letter-spacing: 0.15em;
-		color: var(--color-accent);
-		text-transform: uppercase;
-		margin-bottom: 1.5rem;
-	}
-
-	/* Blocks spacing */
-	.home-layout > :global(*) {
-		margin-block-start: var(--spacing-2xl);
-	}
-
-	.home-body {
-		--prose-media-column: 1 / -1;
-		margin-block-start: var(--section-gap);
-	}
-</style>

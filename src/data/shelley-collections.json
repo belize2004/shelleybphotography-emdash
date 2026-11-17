@@ -1,0 +1,74 @@
+[
+  {
+    "vol": "VOL. 01",
+    "badge": "Signature",
+    "location": "Gulf Shores, AL",
+    "title": "Gulf Coast Beach Family Portraits",
+    "category": "Beach Family",
+    "image": "https://shelleybphotography.com/photos/medium/0bc30285-6121-434d-9091-445aaf08499e.avif/",
+    "thumb": "https://shelleybphotography.com/photos/medium/0bc30285-6121-434d-9091-445aaf08499e.avif/",
+    "count": "35+ Portraits",
+    "narrative": "Multi-generational family heirlooms and joyful moments set against sugar-white dunes and emerald Gulf Coast tides at golden hour.",
+    "url": "/work/gulf-shores-family-sunset"
+  },
+  {
+    "vol": "VOL. 02",
+    "badge": "Editorial",
+    "location": "Downtown Pensacola · Beach",
+    "title": "Senior Milestone & Athletic Media",
+    "category": "Seniors",
+    "image": "https://shelleybphotography.com/images/gallery/seniors/senior-hero-downtown.jpg",
+    "thumb": "https://shelleybphotography.com/images/gallery/seniors/senior-hero-downtown.jpg",
+    "count": "24 Portraits",
+    "narrative": "Personalized senior portraits celebrating personality, athletic dedication, and future horizons. No rushed cookie-cutter backdrops.",
+    "url": "/work/pensacola-senior-milestone"
+  },
+  {
+    "vol": "VOL. 03",
+    "badge": "Published",
+    "location": "Ono Island · Orange Beach",
+    "title": "The Wall Street Journal Feature",
+    "category": "Published Luxury",
+    "image": "https://shelleybphotography.com/photos/medium/d7fbc79a-85df-48cc-bbe6-c73e7375de2c.avif/",
+    "thumb": "https://shelleybphotography.com/photos/medium/d7fbc79a-85df-48cc-bbe6-c73e7375de2c.avif/",
+    "count": "18 Portraits",
+    "narrative": "Commissioned editorial portraiture for The Wall Street Journal Global Luxury Mansion section, capturing coastal architectural elegance.",
+    "url": "/work/wall-street-journal-feature"
+  },
+  {
+    "vol": "VOL. 04",
+    "badge": "Extended",
+    "location": "Orange Beach, AL",
+    "title": "Multi-Generation Family Gatherings",
+    "category": "Beach Family",
+    "image": "https://shelleybphotography.com/photos/medium/d289b550-faa1-4eb6-8e6b-e035c093be74.avif/",
+    "thumb": "https://shelleybphotography.com/photos/medium/d289b550-faa1-4eb6-8e6b-e035c093be74.avif/",
+    "count": "40+ Portraits",
+    "narrative": "Gathering grandparents, children, and cousins in effortless, candid poses with our two-photographer team ensuring every grouping shines.",
+    "url": "/work/orange-beach-extended-family"
+  },
+  {
+    "vol": "VOL. 05",
+    "badge": "Nature",
+    "location": "Perdido Key State Park, FL",
+    "title": "Perdido Key Coastal Dunes",
+    "category": "Dunes & Coastal",
+    "image": "https://shelleybphotography.com/photos/medium/39229855-85c8-446f-a7c8-04ea40a5ef08.avif/",
+    "thumb": "https://shelleybphotography.com/photos/medium/39229855-85c8-446f-a7c8-04ea40a5ef08.avif/",
+    "count": "28 Portraits",
+    "narrative": "Quiet stretches of sea oats, protected wildlife dunes, and warm sunset illumination for families seeking an intimate, natural sanctuary.",
+    "url": "/work/perdido-key-sunset-collection"
+  },
+  {
+    "vol": "VOL. 06",
+    "badge": "Sunrise",
+    "location": "Pensacola Beach & 30A",
+    "title": "Sunrise Petite & Coastal Milestones",
+    "category": "Sunrise & Little Ones",
+    "image": "https://shelleybphotography.com/photos/medium/0c99c316-d5dd-4eca-af27-eb67d7dfadbb.avif/",
+    "thumb": "https://shelleybphotography.com/photos/medium/0c99c316-d5dd-4eca-af27-eb67d7dfadbb.avif/",
+    "count": "20 Portraits",
+    "narrative": "Cool morning coastal breezes and gentle pastel skies designed specifically for toddlers, babies, and young families.",
+    "url": "/work/emerald-coast-coastal-babies"
+  }
+]

@@ -1,0 +1,157 @@
+---
+// Site Header matching the Dixon Creative luxury layout
+---
+
+<header class="siteheader">
+	<a class="brand" href="/" aria-label="Shelley B Photography home">
+		<img src="/images/logo.avif" alt="Shelley B Photography" width="172" height="68" />
+	</a>
+
+	<nav aria-label="Main navigation" class="nav-links-desktop">
+		<a href="#specialties">Session Lookbook</a>
+		<a href="#experience">The Experience</a>
+		<a href="/about">Meet Shelley & Blaine</a>
+	</nav>
+
+	<a class="headercta" href="#inquire">Inquire session <span>↗</span></a>
+
+	<button class="menubutton" id="mobile-menu-trigger" aria-label="Open menu" aria-expanded="false">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M4 8h16M4 16h16"></path>
+		</svg>
+	</button>
+</header>
+
+<div class="mobilemenu" id="mobile-menu-drawer" hidden>
+	<a href="#specialties">Session Lookbook</a>
+	<a href="#experience">The Experience</a>
+	<a href="/about">Meet Shelley & Blaine</a>
+	<a href="#inquire">Inquire session ↗</a>
+</div>
+
+<script>
+	const btn = document.getElementById("mobile-menu-trigger");
+	const drawer = document.getElementById("mobile-menu-drawer");
+	btn?.addEventListener("click", () => {
+		const isExpanded = btn.getAttribute("aria-expanded") === "true";
+		btn.setAttribute("aria-expanded", String(!isExpanded));
+		if (drawer) {
+			drawer.hidden = isExpanded;
+		}
+	});
+
+	// Close drawer on link click
+	drawer?.querySelectorAll("a").forEach((link) => {
+		link.addEventListener("click", () => {
+			if (drawer) drawer.hidden = true;
+			btn?.setAttribute("aria-expanded", "false");
+		});
+	});
+</script>
+
+<style>
+	.siteheader {
+		position: sticky;
+		top: 0;
+		z-index: 100;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.25rem var(--page-margin);
+		background: rgba(17, 17, 17, 0.85);
+		backdrop-filter: blur(12px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		max-width: 100%;
+	}
+
+	.brand img {
+		height: 48px;
+		width: auto;
+		object-fit: contain;
+		filter: brightness(0) invert(1);
+	}
+
+	.nav-links-desktop {
+		display: flex;
+		align-items: center;
+		gap: 2.5rem;
+	}
+
+	.nav-links-desktop a {
+		font-family: var(--font-body);
+		font-size: 0.9rem;
+		color: #e0e0e0;
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.nav-links-desktop a:hover {
+		color: var(--color-accent);
+	}
+
+	.headercta {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		border: 1px solid rgba(201, 169, 110, 0.4);
+		padding: 0.5rem 1.25rem;
+		border-radius: var(--radius-full);
+		font-size: 0.85rem;
+		color: var(--color-accent);
+		text-decoration: none;
+		transition: all 0.2s ease;
+	}
+
+	.headercta:hover {
+		background: var(--color-accent);
+		color: #111;
+		border-color: var(--color-accent);
+	}
+
+	.menubutton {
+		display: none;
+		background: none;
+		border: 0;
+		color: #fff;
+		cursor: pointer;
+		padding: 0.5rem;
+	}
+
+	.menubutton svg {
+		width: 24px;
+		height: 24px;
+	}
+
+	.mobilemenu {
+		position: fixed;
+		top: 75px;
+		left: 0;
+		right: 0;
+		background: #141414;
+		border-bottom: 1px solid var(--color-border);
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		z-index: 99;
+	}
+
+	.mobilemenu a {
+		color: #fff;
+		text-decoration: none;
+		font-size: 1.1rem;
+		padding-block: 0.5rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	}
+
+	@media (max-width: 850px) {
+		.nav-links-desktop,
+		.headercta {
+			display: none;
+		}
+
+		.menubutton {
+			display: block;
+		}
+	}
+</style>

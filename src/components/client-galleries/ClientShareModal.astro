@@ -1,0 +1,542 @@
+---
+import { getRuntimeValue } from "../../lib/env";
+
+interface Props {
+  galleryId: string;
+  galleryTitle: string;
+  shareUrl: string;
+  artistName: string;
+  clientName?: string | null;
+  hasPassword?: boolean;
+  downloadPin?: string | null;
+  modalId?: string;
+}
+
+const {
+  galleryId,
+  galleryTitle,
+  shareUrl: rawShareUrl,
+  artistName,
+  clientName,
+  hasPassword = false,
+  downloadPin,
+  modalId = "client-share-modal",
+} = Astro.props;
+
+const fallbackOrigin = getRuntimeValue("PUBLIC_SITE_URL", Astro.locals.runtime?.env)?.replace(/\/$/, "") || Astro.url.origin;
+const shareUrl = rawShareUrl && (rawShareUrl.startsWith("http://") || rawShareUrl.startsWith("https://"))
+  ? rawShareUrl
+  : new URL(rawShareUrl || "/", fallbackOrigin).toString();
+---
+
+<div id={modalId} class="lumio-share-modal-wrapper" data-share-modal data-gallery-id={galleryId}>
+  <div class="lumio-share-backdrop" onclick="this.parentElement.classList.remove('is-open')"></div>
+  
+  <div class="lumio-share-dialog">
+    <header class="lumio-share-header">
+      <div>
+        <p class="lumio-share-eyebrow">Client Delivery Hub</p>
+        <h2>Share "{galleryTitle}"</h2>
+      </div>
+      <button type="button" class="lumio-share-close-btn" onclick="this.closest('.lumio-share-modal-wrapper').classList.remove('is-open')" aria-label="Close modal">×</button>
+    </header>
+
+    <div class="lumio-share-tabs-nav">
+      <button type="button" class="lumio-share-tab-btn active" data-share-tab-target="client">
+        👤 Client Delivery
+      </button>
+      <button type="button" class="lumio-share-tab-btn" data-share-tab-target="vendor">
+        🤝 Vendor Access & Credit
+      </button>
+    </div>
+
+    <!-- TAB 1: Client Delivery -->
+    <div class="lumio-share-body active" data-share-tab-panel="client">
+      <!-- Direct Link Row -->
+      <div class="lumio-share-field-group">
+        <label>Direct Gallery Link</label>
+        <div class="lumio-share-copy-row">
+          <input type="text" readonly value={shareUrl} class="lumio-share-input" data-share-url-input />
+          <button type="button" class="lumio-share-copy-btn" data-copy-btn="url">
+            Copy Link
+          </button>
+        </div>
+      </div>
+
+      <!-- Security / PIN Row -->
+      <div class="lumio-share-grid-row">
+        {hasPassword && (
+          <div class="lumio-share-mini-card">
+            <span class="mini-card-label">Password Protected</span>
+            <strong class="mini-card-val">Configured</strong>
+            <small>Clients enter the password you set during creation.</small>
+          </div>
+        )}
+        {downloadPin && (
+          <div class="lumio-share-mini-card">
+            <span class="mini-card-label">Download PIN</span>
+            <div class="mini-card-pin-row">
+              <strong class="mini-card-val pin-code">{downloadPin}</strong>
+              <button type="button" class="mini-copy-btn" data-copy-text={downloadPin} title="Copy PIN">
+                Copy PIN
+              </button>
+            </div>
+            <small>Required when clients download full resolution photos.</small>
+          </div>
+        )}
+      </div>
+
+      <!-- Pre-formatted Client Invite Message -->
+      <div class="lumio-share-field-group">
+        <label>Ready-to-Send Client Message (Email / SMS / WhatsApp)</label>
+        <textarea
+          readonly
+          rows="4"
+          class="lumio-share-textarea"
+          data-client-invite-template
+        >{`Hi ${clientName || "there"}!\n\nYour private gallery "${galleryTitle}" from ${artistName} is ready to view and download:\n${shareUrl}${downloadPin ? `\nDownload PIN: ${downloadPin}` : ""}\n\nEnjoy browsing and selecting your favorite photos!`}</textarea>
+        <div class="lumio-share-actions-row">
+          <button type="button" class="lumio-share-template-btn" data-copy-btn="template">
+            📋 Copy Message to Clipboard
+          </button>
+          <a class="lumio-share-portal-link" href={shareUrl} target="_blank" rel="noreferrer">
+            Open Gallery ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Vendor Access & Attribution -->
+    <div class="lumio-share-body" data-share-tab-panel="vendor">
+      <div class="lumio-share-field-group">
+        <label>Vendor Sharing Link (Venues, Florists, MUAs, Planners)</label>
+        <div class="lumio-share-copy-row">
+          <input type="text" readonly value={`${shareUrl}?ref=vendor`} class="lumio-share-input" data-vendor-url-input />
+          <button type="button" class="lumio-share-copy-btn" data-copy-btn="vendor-url">
+            Copy Link
+          </button>
+        </div>
+      </div>
+
+      <div class="lumio-share-mini-card" style="margin-bottom: 16px;">
+        <span class="mini-card-label">Attribution & Usage Policy</span>
+        <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 4px 0 0; line-height: 1.4;">
+          Vendors are licensed to use web-resolution images for social media and portfolio marketing with mandatory photographer credit.
+        </p>
+      </div>
+
+      <!-- Pre-formatted Vendor Attribution Caption -->
+      <div class="lumio-share-field-group">
+        <label>1-Click Social Media Credit / Caption</label>
+        <textarea
+          readonly
+          rows="3"
+          class="lumio-share-textarea"
+          data-vendor-credit-template
+        >{`📷 Photography by ${artistName}\nGallery: ${shareUrl}\nPlease tag and credit ${artistName} when publishing or reposting.`}</textarea>
+        <div class="lumio-share-actions-row">
+          <button type="button" class="lumio-share-template-btn" data-copy-btn="vendor-credit">
+            📋 Copy Credit Caption
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  if (!window.__lumioShareModalInitialized) {
+    window.__lumioShareModalInitialized = true;
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document.querySelectorAll(".lumio-share-modal-wrapper.is-open").forEach((m) => m.classList.remove("is-open"));
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      // Tab Switching
+      const tabBtn = e.target.closest(".lumio-share-tab-btn");
+      if (tabBtn) {
+        const modal = tabBtn.closest(".lumio-share-modal-wrapper");
+        const target = tabBtn.getAttribute("data-share-tab-target");
+        if (modal && target) {
+          modal.querySelectorAll(".lumio-share-tab-btn").forEach((b) => b.classList.remove("active"));
+          modal.querySelectorAll(".lumio-share-body").forEach((p) => p.classList.remove("active"));
+          tabBtn.classList.add("active");
+          modal.querySelector(`[data-share-tab-panel="${target}"]`)?.classList.add("active");
+        }
+      }
+
+      // Handle opening modal by trigger
+      const openTrigger = e.target.closest("[data-open-share-modal]");
+      if (openTrigger) {
+        e.preventDefault();
+        const targetModalId = openTrigger.getAttribute("data-open-share-modal") || "client-share-modal";
+        const targetModal = document.getElementById(targetModalId);
+        if (targetModal) {
+          targetModal.classList.add("is-open");
+          // Ensure all share inputs and message templates have absolute URLs
+          targetModal.querySelectorAll("[data-share-url-input], [data-vendor-url-input]").forEach((input) => {
+            if (input.value && !input.value.startsWith("http")) {
+              input.value = new URL(input.value, window.location.origin).toString();
+            }
+          });
+          targetModal.querySelectorAll("[data-client-invite-template], [data-vendor-credit-template]").forEach((textarea) => {
+            if (textarea.value) {
+              textarea.value = textarea.value.replace(
+                /(^|\s)(\/(?:artists|artwork)\/[^\s\n]+)/g,
+                (_, prefix, path) => prefix + new URL(path, window.location.origin).toString(),
+              );
+            }
+          });
+        }
+      }
+
+      // Handle copying URL and templates
+      const copyBtn = e.target.closest("[data-copy-btn]");
+      if (copyBtn) {
+        const type = copyBtn.getAttribute("data-copy-btn");
+        const wrapper = copyBtn.closest(".lumio-share-modal-wrapper");
+        let textToCopy = "";
+
+        if (type === "url") {
+          const input = wrapper?.querySelector("[data-share-url-input]");
+          textToCopy = input?.value || "";
+        } else if (type === "vendor-url") {
+          const input = wrapper?.querySelector("[data-vendor-url-input]");
+          textToCopy = input?.value || "";
+        } else if (type === "template") {
+          const textarea = wrapper?.querySelector("[data-client-invite-template]");
+          textToCopy = textarea?.value || "";
+        } else if (type === "vendor-credit") {
+          const textarea = wrapper?.querySelector("[data-vendor-credit-template]");
+          textToCopy = textarea?.value || "";
+        }
+
+        if (textToCopy) {
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = "✓ Copied!";
+            copyBtn.classList.add("copied");
+            setTimeout(() => {
+              copyBtn.textContent = originalText;
+              copyBtn.classList.remove("copied");
+            }, 2000);
+          });
+        }
+      }
+
+      // Handle copying custom text
+      const miniCopyBtn = e.target.closest("[data-copy-text]");
+      if (miniCopyBtn) {
+        const val = miniCopyBtn.getAttribute("data-copy-text");
+        if (val) {
+          navigator.clipboard.writeText(val).then(() => {
+            const original = miniCopyBtn.textContent;
+            miniCopyBtn.textContent = "✓ Copied";
+            setTimeout(() => {
+              miniCopyBtn.textContent = original;
+            }, 1800);
+          });
+        }
+      }
+    });
+  }
+</script>
+
+<style>
+  .lumio-share-modal-wrapper {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1300;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    isolation: isolate;
+  }
+
+  .lumio-share-modal-wrapper *,
+  .lumio-share-modal-wrapper *::before,
+  .lumio-share-modal-wrapper *::after {
+    box-sizing: border-box;
+  }
+
+  .lumio-share-modal-wrapper.is-open {
+    display: flex;
+  }
+
+  .lumio-share-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 1;
+  }
+
+  .lumio-share-dialog {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 580px;
+    max-height: min(90dvh, 640px);
+    display: flex;
+    flex-direction: column;
+    background: #14171e;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    color: #fff;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+  }
+
+  .lumio-share-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+  }
+
+  .lumio-share-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+
+  .lumio-share-header h2 {
+    font-size: 18px;
+    margin: 0;
+    color: #fff;
+  }
+
+  .lumio-share-close-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 26px;
+    cursor: pointer;
+    line-height: 1;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+  }
+
+  .lumio-share-tabs-nav {
+    display: flex;
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0 16px;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .lumio-share-tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .lumio-share-tab-btn:hover {
+    color: #fff;
+  }
+
+  .lumio-share-tab-btn.active {
+    color: #fff;
+    border-bottom-color: #0071e3;
+  }
+
+  .lumio-share-body {
+    padding: 24px;
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .lumio-share-body.active {
+    display: flex;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .lumio-share-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .lumio-share-field-group label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 600;
+  }
+
+  .lumio-share-copy-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .lumio-share-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 6px;
+    color: #fff;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-family: monospace;
+    outline: none;
+  }
+
+  .lumio-share-copy-btn {
+    background: #fff;
+    border: 1px solid #fff;
+    color: #000;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 0 18px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+  }
+
+  .lumio-share-copy-btn:hover {
+    background: #e5e5e5;
+  }
+
+  .lumio-share-copy-btn.copied {
+    background: #28a745;
+    border-color: #28a745;
+    color: #fff;
+  }
+
+  .lumio-share-grid-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .lumio-share-mini-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mini-card-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .mini-card-val {
+    font-size: 15px;
+    color: #fff;
+  }
+
+  .mini-card-val.pin-code {
+    font-family: monospace;
+    font-size: 18px;
+    letter-spacing: 0.15em;
+    color: #75e094;
+  }
+
+  .mini-card-pin-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 2px 0;
+  }
+
+  .mini-copy-btn {
+    background: rgba(255, 255, 255, 0.12);
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .mini-copy-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .lumio-share-mini-card small {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .lumio-share-textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 12px;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+  }
+
+  .lumio-share-actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .lumio-share-template-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .lumio-share-template-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .lumio-share-portal-link {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    text-decoration: none;
+  }
+
+  .lumio-share-portal-link:hover {
+    color: #fff;
+    text-decoration: underline;
+  }
+</style>

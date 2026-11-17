@@ -1,0 +1,1301 @@
+---
+interface Props {
+  galleryId: string;
+  artistName?: string;
+  storefrontSlug: string;
+  printCreditBalanceCents?: number;
+}
+
+const {
+  galleryId,
+  artistName = "",
+  storefrontSlug,
+  printCreditBalanceCents = 0,
+} = Astro.props;
+
+const DEFAULT_PRINT_SIZES = [
+  { label: "5x7", width: 5, height: 7, basePriceCents: 2500 },
+  { label: "8x10", width: 8, height: 10, basePriceCents: 4500, popular: true },
+  { label: "11x14", width: 11, height: 14, basePriceCents: 7500 },
+  { label: "16x20", width: 16, height: 20, basePriceCents: 16000 },
+  { label: "24x36", width: 24, height: 36, basePriceCents: 37500 },
+];
+
+const DEFAULT_MATERIALS = [
+  { id: "fine-art-matte", name: "Matte Fine Art", desc: "Smooth cotton rag, museum-grade archival ink", multiplier: 1.0 },
+  { id: "lustre", name: "Lustre Print", desc: "Classic rich contrast with soft satin sheen", multiplier: 0.9 },
+  { id: "deep-velvet", name: "Deep Velvet", desc: "Heavyweight fine-art paper with tactile velvet finish", multiplier: 1.25 },
+  { id: "canvas-wrap", name: "Gallery Canvas Wrap", desc: "Hand-stretched 1.5\" solid wood frame", multiplier: 1.8 },
+  { id: "gloss-metal", name: "Gloss Metal", desc: "Vibrant ChromaLuxe aluminum print with float hanger", multiplier: 1.9 },
+];
+---
+
+<div
+  id="lumio-print-drawer-backdrop"
+  class="lumio-print-drawer-backdrop"
+  aria-hidden="true"
+  hidden
+></div>
+
+<aside
+  id="lumio-print-order-drawer"
+  class="lumio-print-order-drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="drawer-heading"
+  hidden
+  data-gallery-id={galleryId}
+  data-artist-name={artistName}
+  data-storefront-slug={storefrontSlug}
+  data-print-credit={printCreditBalanceCents}
+>
+  <div class="drawer-inner">
+    <!-- Header -->
+    <header class="drawer-header">
+      <div>
+        <p class="drawer-eyebrow">Order Fine-Art Wall Print</p>
+        <h2 id="drawer-heading" class="drawer-title" data-drawer-title>Selected Portrait</h2>
+      </div>
+      <button type="button" class="drawer-close-btn" id="drawer-close-btn" aria-label="Close print drawer">
+        ✕
+      </button>
+    </header>
+
+    <!-- Scrollable Body -->
+    <div class="drawer-body">
+      <!-- Live Aspect Ratio Crop Visualizer -->
+      <section class="drawer-section crop-visualizer-section">
+        <div class="crop-header-row">
+          <label class="section-label">Composition & Framing</label>
+          <span class="crop-hint-badge" id="crop-interaction-hint">Drag framing window to adjust composition</span>
+        </div>
+
+        <div class="crop-preview-container" id="crop-preview-container">
+          <div class="crop-image-stage" id="crop-image-stage">
+            <img
+              id="drawer-preview-image"
+              src=""
+              alt="Selected portrait crop preview"
+              class="crop-preview-img"
+              draggable="false"
+            />
+            
+            <!-- Interactive Crop Window Overlay Box -->
+            <div
+              id="crop-overlay-box"
+              class="crop-overlay-box"
+              role="region"
+              aria-label="Adjust print crop framing"
+              tabindex="0"
+            >
+              <!-- Subtle darkroom rule-of-thirds grid -->
+              <div class="crop-grid-line crop-grid-h1" aria-hidden="true"></div>
+              <div class="crop-grid-line crop-grid-h2" aria-hidden="true"></div>
+              <div class="crop-grid-line crop-grid-v1" aria-hidden="true"></div>
+              <div class="crop-grid-line crop-grid-v2" aria-hidden="true"></div>
+
+              <!-- Refined darkroom corner markers -->
+              <div class="crop-corner crop-corner-tl" aria-hidden="true"></div>
+              <div class="crop-corner crop-corner-tr" aria-hidden="true"></div>
+              <div class="crop-corner crop-corner-bl" aria-hidden="true"></div>
+              <div class="crop-corner crop-corner-br" aria-hidden="true"></div>
+
+              <!-- Center drag handle cue -->
+              <div class="crop-drag-pill" id="crop-drag-pill" aria-hidden="true">
+                <svg class="crop-drag-icon" viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+                  <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm1 4h4v3h3l-5 5-5-5h3v-3zm5-4h3v-3l5 5-5 5v-3h-3v-4z"/>
+                </svg>
+                <span class="crop-drag-label" id="crop-drag-label">Drag Framing</span>
+              </div>
+
+              <!-- Aspect Ratio Badge -->
+              <span class="crop-aspect-badge" id="crop-aspect-badge">8×10 Framing</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtle Crop Warning / Indicator Banner -->
+        <div id="crop-warning-banner" class="crop-warning-banner" hidden>
+          <span class="crop-warning-icon" id="crop-warning-icon" aria-hidden="true">⚠</span>
+          <div class="crop-warning-content">
+            <p id="crop-warning-text" class="crop-warning-text">
+              This print size requires minor cropping. Centered on portrait focal point.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Paper / Medium Selection -->
+      <section class="drawer-section">
+        <label class="section-label">1. Select Print Material</label>
+        <div class="material-pills" role="radiogroup" aria-label="Print Materials">
+          {DEFAULT_MATERIALS.map((mat, idx) => (
+            <label class:list={["material-pill-card", idx === 0 && "is-selected"]}>
+              <input
+                type="radio"
+                name="print_material"
+                value={mat.id}
+                data-multiplier={mat.multiplier}
+                data-name={mat.name}
+                checked={idx === 0}
+              />
+              <div class="pill-content">
+                <strong class="pill-name">{mat.name}</strong>
+                <span class="pill-desc">{mat.desc}</span>
+              </div>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <!-- Size Selection Matrix -->
+      <section class="drawer-section">
+        <label class="section-label">2. Select Dimensions</label>
+        <div class="size-grid" role="radiogroup" aria-label="Print Sizes">
+          {DEFAULT_PRINT_SIZES.map((sz, idx) => (
+            <label class:list={["size-card", sz.popular && "is-popular", idx === 1 && "is-selected"]}>
+              <input
+                type="radio"
+                name="print_size"
+                value={sz.label}
+                data-width={sz.width}
+                data-height={sz.height}
+                data-base-price={sz.basePriceCents}
+                checked={idx === 1}
+              />
+              <div class="size-card-inner">
+                {sz.popular && <span class="popular-tag">Popular</span>}
+                <span class="size-dimensions">{sz.label}″</span>
+                <span class="size-price" data-size-price-label={`$${(sz.basePriceCents / 100).toFixed(0)}`}>
+                  ${(sz.basePriceCents / 100).toFixed(0)}
+                </span>
+              </div>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <!-- Optional Framing Add-on -->
+      <section class="drawer-section framing-section">
+        <label class="framing-toggle-card">
+          <input type="checkbox" id="drawer-frame-checkbox" data-frame-price="6500" />
+          <div class="framing-toggle-content">
+            <div>
+              <strong>Add Custom Hardwood Gallery Frame</strong>
+              <p>Solid oak frame with archival conservation matting (+ $65)</p>
+            </div>
+            <span class="framing-price">+$65</span>
+          </div>
+        </label>
+      </section>
+    </div>
+
+    <!-- Sticky Action Footer -->
+    <footer class="drawer-footer">
+      <div class="price-summary-row">
+        <span class="price-label">Total Investment</span>
+        <div class="price-figures">
+          <strong class="total-price" id="drawer-total-price">$45.00</strong>
+          {printCreditBalanceCents > 0 && (
+            <span class="credit-applied-tag" id="drawer-credit-tag">
+              Covered by ${(printCreditBalanceCents / 100).toFixed(0)} Print Credit
+            </span>
+          )}
+        </div>
+      </div>
+
+      <!-- Express Checkout Action -->
+      <div class="express-checkout-bar" id="drawer-express-bar">
+        <button type="button" class="drawer-express-btn" id="drawer-express-pay-btn">
+          <span class="express-apple-logo">⚡</span>
+          <span>Instant Express Checkout</span>
+        </button>
+      </div>
+
+      <!-- Standard Add to Cart -->
+      <button type="button" class="drawer-add-cart-btn" id="drawer-add-cart-btn">
+        Add to Order Bag
+      </button>
+
+      <p class="fulfillment-guarantee">
+        Archival quality guarantee · Handcrafted by preferred fine-art print lab
+      </p>
+    </footer>
+  </div>
+</aside>
+
+<style>
+  .lumio-print-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99990;
+    background: rgba(10, 12, 16, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+  }
+
+  .lumio-print-drawer-backdrop[hidden] {
+    display: none !important;
+  }
+
+  .lumio-print-order-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 440px;
+    max-width: 100vw;
+    z-index: 99995;
+    background: #ffffff;
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(0);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .lumio-print-order-drawer[hidden] {
+    display: none !important;
+  }
+
+  .drawer-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fafafa;
+  }
+
+  .drawer-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #a57a55;
+    font-weight: 600;
+    margin: 0 0 2px;
+  }
+
+  .drawer-title {
+    font-family: Georgia, serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: #111827;
+    margin: 0;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .drawer-close-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    color: #6b7280;
+    cursor: pointer;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .drawer-close-btn:hover {
+    background: #e5e7eb;
+    color: #111827;
+  }
+
+  .drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .drawer-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #374151;
+  }
+
+  /* Crop Visualizer */
+  .crop-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .crop-hint-badge {
+    font-size: 11px;
+    color: #8c6d48;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .crop-preview-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    background: #0a0c10;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .crop-image-stage {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    max-height: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+    touch-action: none;
+  }
+
+  .crop-preview-img {
+    max-width: 100%;
+    max-height: 226px;
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .crop-overlay-box {
+    position: absolute;
+    inset: 0;
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4), 0 0 0 9999px rgba(10, 12, 16, 0.65);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 6px 8px;
+    box-sizing: border-box;
+    cursor: grab;
+    touch-action: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    outline: none;
+  }
+
+  .crop-overlay-box:focus-visible {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 2px #d4af37, 0 0 0 9999px rgba(10, 12, 16, 0.68);
+  }
+
+  .crop-overlay-box.is-dragging {
+    cursor: grabbing !important;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 0 0 9999px rgba(10, 12, 16, 0.75);
+  }
+
+  .crop-overlay-box.is-exact-fit {
+    cursor: default;
+    border-color: rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+  }
+
+  .crop-overlay-box.is-significant-crop {
+    border-color: #f59e0b;
+  }
+
+  /* Rule of thirds grid lines */
+  .crop-grid-line {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+    transition: background 0.15s ease;
+  }
+
+  .crop-overlay-box:hover .crop-grid-line,
+  .crop-overlay-box.is-dragging .crop-grid-line {
+    background: rgba(255, 255, 255, 0.35);
+  }
+
+  .crop-grid-h1 {
+    top: 33.33%;
+    left: 0;
+    right: 0;
+    height: 1px;
+  }
+
+  .crop-grid-h2 {
+    top: 66.66%;
+    left: 0;
+    right: 0;
+    height: 1px;
+  }
+
+  .crop-grid-v1 {
+    left: 33.33%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+  }
+
+  .crop-grid-v2 {
+    left: 66.66%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+  }
+
+  /* Corner Darkroom Brackets */
+  .crop-corner {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-color: #ffffff;
+    border-style: solid;
+    pointer-events: none;
+  }
+
+  .crop-corner-tl {
+    top: -1px;
+    left: -1px;
+    border-width: 2px 0 0 2px;
+  }
+
+  .crop-corner-tr {
+    top: -1px;
+    right: -1px;
+    border-width: 2px 2px 0 0;
+  }
+
+  .crop-corner-bl {
+    bottom: -1px;
+    left: -1px;
+    border-width: 0 0 2px 2px;
+  }
+
+  .crop-corner-br {
+    bottom: -1px;
+    right: -1px;
+    border-width: 0 2px 2px 0;
+  }
+
+  /* Center Drag Pill */
+  .crop-drag-pill {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(17, 24, 39, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #f3f4f6;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    pointer-events: none;
+    opacity: 0.85;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    user-select: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .crop-overlay-box.is-exact-fit .crop-drag-pill,
+  .crop-overlay-box.is-exact-fit .crop-grid-line {
+    display: none;
+  }
+
+  .crop-overlay-box:hover .crop-drag-pill,
+  .crop-overlay-box.is-dragging .crop-drag-pill {
+    opacity: 1;
+    background: rgba(17, 24, 39, 0.9);
+  }
+
+  .crop-drag-icon {
+    display: block;
+    opacity: 0.85;
+  }
+
+  .crop-aspect-badge {
+    position: absolute;
+    bottom: 6px;
+    right: 8px;
+    background: rgba(17, 24, 39, 0.85);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+  }
+
+  .crop-warning-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #92400e;
+    transition: all 0.2s ease;
+  }
+
+  .crop-warning-banner[hidden] {
+    display: none !important;
+  }
+
+  .crop-warning-banner.is-significant {
+    background: #fff7ed;
+    border-color: #ffedd5;
+    color: #9a3412;
+  }
+
+  .crop-warning-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    line-height: 1.2;
+  }
+
+  .crop-warning-content {
+    flex: 1;
+  }
+
+  .crop-warning-text {
+    margin: 0;
+  }
+
+  /* Material Pills */
+  .material-pills {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .material-pill-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .material-pill-card:hover {
+    border-color: #d1d5db;
+    background: #fafafa;
+  }
+
+  .material-pill-card.is-selected {
+    border-color: #111827;
+    background: #f9fafb;
+  }
+
+  .material-pill-card input {
+    margin-top: 3px;
+    accent-color: #111827;
+  }
+
+  .pill-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pill-name {
+    font-size: 13px;
+    color: #111827;
+  }
+
+  .pill-desc {
+    font-size: 11px;
+    color: #6b7280;
+  }
+
+  /* Size Grid */
+  .size-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .size-card {
+    position: relative;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .size-card:hover {
+    border-color: #d1d5db;
+  }
+
+  .size-card.is-selected {
+    border-color: #111827;
+    background: #111827;
+    color: #ffffff;
+  }
+
+  .size-card.is-selected .size-dimensions,
+  .size-card.is-selected .size-price {
+    color: #ffffff;
+  }
+
+  .size-card input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .size-card-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .popular-tag {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #a57a55;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1px 6px;
+    border-radius: 999px;
+  }
+
+  .size-dimensions {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .size-price {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  /* Framing Card */
+  .framing-toggle-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px dashed #d1d5db;
+    border-radius: 6px;
+    background: #fafafa;
+    cursor: pointer;
+  }
+
+  .framing-toggle-card input {
+    accent-color: #111827;
+  }
+
+  .framing-toggle-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .framing-toggle-content strong {
+    font-size: 13px;
+    color: #111827;
+    display: block;
+  }
+
+  .framing-toggle-content p {
+    font-size: 11px;
+    color: #6b7280;
+    margin: 2px 0 0;
+  }
+
+  .framing-price {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  /* Footer */
+  .drawer-footer {
+    padding: 20px 24px calc(20px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid #e5e7eb;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .price-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .price-label {
+    font-size: 13px;
+    color: #4b5563;
+    font-weight: 500;
+  }
+
+  .price-figures {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .total-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  .credit-applied-tag {
+    font-size: 11px;
+    color: #059669;
+    font-weight: 600;
+  }
+
+  .drawer-express-btn {
+    appearance: none;
+    width: 100%;
+    background: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  .drawer-express-btn:hover {
+    background: #262626;
+    transform: translateY(-1px);
+  }
+
+  .express-apple-logo {
+    font-size: 16px;
+  }
+
+  .drawer-add-cart-btn {
+    appearance: none;
+    width: 100%;
+    background: #ffffff;
+    color: #111827;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .drawer-add-cart-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+  }
+
+  .fulfillment-guarantee {
+    font-size: 11px;
+    color: #9ca3af;
+    text-align: center;
+    margin: 0;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const backdrop = document.getElementById("lumio-print-drawer-backdrop");
+    const drawer = document.getElementById("lumio-print-order-drawer");
+    if (!drawer || !backdrop) return;
+
+    let activeArtwork = null;
+    let selectedMaterialMultiplier = 1.0;
+    let selectedSize = { label: "8x10", width: 8, height: 10, basePriceCents: 4500 };
+    let hasFrame = false;
+
+    // Crop State
+    let currentCrop = {
+      topPercent: 0,
+      leftPercent: 0,
+      widthPercent: 100,
+      heightPercent: 100,
+    };
+
+    const headingEl = document.getElementById("drawer-heading");
+    const previewImg = document.getElementById("drawer-preview-image");
+    const cropBox = document.getElementById("crop-overlay-box");
+    const cropAspectBadge = document.getElementById("crop-aspect-badge");
+    const cropWarningBanner = document.getElementById("crop-warning-banner");
+    const cropWarningText = document.getElementById("crop-warning-text");
+    const cropInteractionHint = document.getElementById("crop-interaction-hint");
+    const totalPriceEl = document.getElementById("drawer-total-price");
+    const closeBtn = document.getElementById("drawer-close-btn");
+    const frameCheckbox = document.getElementById("drawer-frame-checkbox");
+    const expressBtn = document.getElementById("drawer-express-pay-btn");
+    const addCartBtn = document.getElementById("drawer-add-cart-btn");
+
+    function updateCalculations() {
+      if (!activeArtwork) return;
+
+      const baseCents = selectedSize.basePriceCents;
+      const frameCents = hasFrame ? 6500 : 0;
+      const totalCents = Math.round(baseCents * selectedMaterialMultiplier) + frameCents;
+
+      if (totalPriceEl) {
+        totalPriceEl.textContent = `$${(totalCents / 100).toFixed(2)}`;
+      }
+
+      // Natural dimensions of the active image
+      const origW = previewImg?.naturalWidth || activeArtwork.width || 4000;
+      const origH = previewImg?.naturalHeight || activeArtwork.height || 6000;
+      const isPortrait = origH >= origW;
+
+      // Ensure target dimensions match the image orientation
+      const targetShort = Math.min(selectedSize.width, selectedSize.height);
+      const targetLong = Math.max(selectedSize.width, selectedSize.height);
+
+      const targetW = isPortrait ? targetShort : targetLong;
+      const targetH = isPortrait ? targetLong : targetShort;
+
+      const origAspect = origW / origH;       // e.g. 4000 / 6000 = 0.6667 (2:3 portrait)
+      const targetAspect = targetW / targetH; // e.g. 8 / 10 = 0.8 (4:5 portrait)
+
+      if (cropAspectBadge) {
+        cropAspectBadge.textContent = `${targetW}×${targetH} Framing`;
+      }
+
+      if (Math.abs(targetAspect - origAspect) < 0.015) {
+        // Exact aspect ratio match (e.g. 24x36 on 2:3 photo)
+        currentCrop = {
+          topPercent: 0,
+          leftPercent: 0,
+          widthPercent: 100,
+          heightPercent: 100,
+        };
+
+        if (cropBox) {
+          cropBox.style.top = "0%";
+          cropBox.style.left = "0%";
+          cropBox.style.width = "100%";
+          cropBox.style.height = "100%";
+          cropBox.classList.add("is-exact-fit");
+          cropBox.classList.remove("is-significant-crop");
+        }
+
+        if (cropWarningBanner) {
+          cropWarningBanner.hidden = true;
+          cropWarningBanner.classList.remove("is-significant");
+        }
+
+        if (cropInteractionHint) {
+          cropInteractionHint.textContent = "Exact aspect ratio — no crop";
+        }
+      } else if (targetAspect > origAspect) {
+        // Target frame is wider/squarer than the tall image (e.g. 8x10 on 2:3 portrait)
+        // Image must be cropped from top/bottom
+        const cropHeightPercent = (origAspect / targetAspect) * 100;
+        // Keep headroom safe for portraits (default to ~15% from top)
+        const maxTop = Math.max(0, 100 - cropHeightPercent);
+        const cropTopPercent = Math.max(0, Math.min(maxTop, (100 - cropHeightPercent) * 0.15));
+
+        currentCrop = {
+          topPercent: Math.round(cropTopPercent * 10) / 10,
+          leftPercent: 0,
+          widthPercent: 100,
+          heightPercent: Math.round(cropHeightPercent * 10) / 10,
+        };
+
+        if (cropBox) {
+          cropBox.style.top = `${currentCrop.topPercent}%`;
+          cropBox.style.left = "0%";
+          cropBox.style.width = "100%";
+          cropBox.style.height = `${currentCrop.heightPercent}%`;
+          cropBox.classList.remove("is-exact-fit");
+        }
+
+        const cutoff = Math.round(100 - cropHeightPercent);
+        applyCropWarning(cutoff, selectedSize.label, "top & bottom");
+      } else {
+        // Target frame is taller/narrower than the image (e.g. 5x7 on 4:5 landscape)
+        // Image must be cropped from sides
+        const cropWidthPercent = (targetAspect / origAspect) * 100;
+        const maxLeft = Math.max(0, 100 - cropWidthPercent);
+        const cropLeftPercent = Math.max(0, Math.min(maxLeft, (100 - cropWidthPercent) / 2));
+
+        currentCrop = {
+          topPercent: 0,
+          leftPercent: Math.round(cropLeftPercent * 10) / 10,
+          widthPercent: Math.round(cropWidthPercent * 10) / 10,
+          heightPercent: 100,
+        };
+
+        if (cropBox) {
+          cropBox.style.left = `${currentCrop.leftPercent}%`;
+          cropBox.style.top = "0%";
+          cropBox.style.width = `${currentCrop.widthPercent}%`;
+          cropBox.style.height = "100%";
+          cropBox.classList.remove("is-exact-fit");
+        }
+
+        const cutoff = Math.round(100 - cropWidthPercent);
+        applyCropWarning(cutoff, selectedSize.label, "horizontal sides");
+      }
+    }
+
+    function applyCropWarning(cutoff, sizeLabel, axisText) {
+      if (cutoff >= 15) {
+        if (cropWarningBanner) {
+          cropWarningBanner.hidden = false;
+          cropWarningBanner.classList.add("is-significant");
+        }
+        if (cropWarningText) {
+          cropWarningText.textContent = `${sizeLabel} aspect ratio trims ${cutoff}% from ${axisText}. Drag framing box to ensure key subjects remain in view.`;
+        }
+        if (cropBox) {
+          cropBox.classList.add("is-significant-crop");
+        }
+        if (cropInteractionHint) {
+          cropInteractionHint.textContent = "Drag framing window to adjust composition";
+        }
+      } else if (cutoff >= 5) {
+        if (cropWarningBanner) {
+          cropWarningBanner.hidden = false;
+          cropWarningBanner.classList.remove("is-significant");
+        }
+        if (cropWarningText) {
+          cropWarningText.textContent = `Minor cropping (${cutoff}%) applied for ${sizeLabel}. Drag framing window to adjust if needed.`;
+        }
+        if (cropBox) {
+          cropBox.classList.remove("is-significant-crop");
+        }
+        if (cropInteractionHint) {
+          cropInteractionHint.textContent = "Drag framing window to adjust composition";
+        }
+      } else {
+        if (cropWarningBanner) cropWarningBanner.hidden = true;
+        if (cropBox) cropBox.classList.remove("is-significant-crop");
+        if (cropInteractionHint) {
+          cropInteractionHint.textContent = "Exact aspect ratio — no crop";
+        }
+      }
+    }
+
+    // Interactive Dragging with Pointer Events (Mouse, Touch, Stylus)
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragStartLeft = 0;
+    let dragStartTop = 0;
+
+    if (cropBox) {
+      cropBox.addEventListener("pointerdown", (e) => {
+        if (currentCrop.widthPercent >= 99.9 && currentCrop.heightPercent >= 99.9) {
+          return;
+        }
+
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        dragStartLeft = currentCrop.leftPercent;
+        dragStartTop = currentCrop.topPercent;
+
+        cropBox.classList.add("is-dragging");
+        try {
+          cropBox.setPointerCapture(e.pointerId);
+        } catch (_) {}
+      });
+
+      cropBox.addEventListener("pointermove", (e) => {
+        if (!isDragging) return;
+
+        const stage = previewImg;
+        if (!stage) return;
+        const rect = stage.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+
+        const deltaX = e.clientX - dragStartX;
+        const deltaY = e.clientY - dragStartY;
+
+        const deltaLeftPercent = (deltaX / rect.width) * 100;
+        const deltaTopPercent = (deltaY / rect.height) * 100;
+
+        const maxLeft = Math.max(0, 100 - currentCrop.widthPercent);
+        const maxTop = Math.max(0, 100 - currentCrop.heightPercent);
+
+        if (currentCrop.widthPercent < 99.9) {
+          const newLeft = Math.max(0, Math.min(maxLeft, dragStartLeft + deltaLeftPercent));
+          currentCrop.leftPercent = Math.round(newLeft * 10) / 10;
+          cropBox.style.left = `${currentCrop.leftPercent}%`;
+        }
+
+        if (currentCrop.heightPercent < 99.9) {
+          const newTop = Math.max(0, Math.min(maxTop, dragStartTop + deltaTopPercent));
+          currentCrop.topPercent = Math.round(newTop * 10) / 10;
+          cropBox.style.top = `${currentCrop.topPercent}%`;
+        }
+      });
+
+      const endDrag = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        cropBox.classList.remove("is-dragging");
+        try {
+          if (e && e.pointerId) {
+            cropBox.releasePointerCapture(e.pointerId);
+          }
+        } catch (_) {}
+      };
+
+      cropBox.addEventListener("pointerup", endDrag);
+      cropBox.addEventListener("pointercancel", endDrag);
+
+      // Keyboard arrow key accessibility
+      cropBox.addEventListener("keydown", (e) => {
+        if (currentCrop.widthPercent >= 99.9 && currentCrop.heightPercent >= 99.9) return;
+        const step = e.shiftKey ? 5 : 2;
+        let handled = false;
+
+        const maxLeft = Math.max(0, 100 - currentCrop.widthPercent);
+        const maxTop = Math.max(0, 100 - currentCrop.heightPercent);
+
+        if (e.key === "ArrowLeft" && currentCrop.widthPercent < 99.9) {
+          currentCrop.leftPercent = Math.max(0, Math.min(maxLeft, currentCrop.leftPercent - step));
+          cropBox.style.left = `${currentCrop.leftPercent}%`;
+          handled = true;
+        } else if (e.key === "ArrowRight" && currentCrop.widthPercent < 99.9) {
+          currentCrop.leftPercent = Math.max(0, Math.min(maxLeft, currentCrop.leftPercent + step));
+          cropBox.style.left = `${currentCrop.leftPercent}%`;
+          handled = true;
+        } else if (e.key === "ArrowUp" && currentCrop.heightPercent < 99.9) {
+          currentCrop.topPercent = Math.max(0, Math.min(maxTop, currentCrop.topPercent - step));
+          cropBox.style.top = `${currentCrop.topPercent}%`;
+          handled = true;
+        } else if (e.key === "ArrowDown" && currentCrop.heightPercent < 99.9) {
+          currentCrop.topPercent = Math.max(0, Math.min(maxTop, currentCrop.topPercent + step));
+          cropBox.style.top = `${currentCrop.topPercent}%`;
+          handled = true;
+        }
+
+        if (handled) {
+          e.preventDefault();
+        }
+      });
+    }
+
+    function openDrawer(artwork) {
+      activeArtwork = artwork;
+      if (headingEl) headingEl.textContent = artwork.title || "Selected Portrait";
+      if (previewImg) {
+        previewImg.onload = () => {
+          updateCalculations();
+        };
+        previewImg.src = artwork.imageUrl;
+      }
+
+      backdrop.hidden = false;
+      drawer.hidden = false;
+      document.body.style.overflow = "hidden";
+      updateCalculations();
+    }
+
+    function closeDrawer() {
+      backdrop.hidden = true;
+      drawer.hidden = true;
+      document.body.style.overflow = "";
+    }
+
+    // Material Radio Listener
+    document.querySelectorAll("input[name='print_material']").forEach((radio) => {
+      radio.addEventListener("change", (e) => {
+        document.querySelectorAll(".material-pill-card").forEach((c) => c.classList.remove("is-selected"));
+        e.target.closest(".material-pill-card")?.classList.add("is-selected");
+        selectedMaterialMultiplier = parseFloat(e.target.getAttribute("data-multiplier") || "1.0");
+        updateCalculations();
+      });
+    });
+
+    // Size Radio Listener
+    document.querySelectorAll("input[name='print_size']").forEach((radio) => {
+      radio.addEventListener("change", (e) => {
+        document.querySelectorAll(".size-card").forEach((c) => c.classList.remove("is-selected"));
+        e.target.closest(".size-card")?.classList.add("is-selected");
+        selectedSize = {
+          label: e.target.value,
+          width: parseInt(e.target.getAttribute("data-width") || "8", 10),
+          height: parseInt(e.target.getAttribute("data-height") || "10", 10),
+          basePriceCents: parseInt(e.target.getAttribute("data-base-price") || "4500", 10),
+        };
+        updateCalculations();
+      });
+    });
+
+    frameCheckbox?.addEventListener("change", (e) => {
+      hasFrame = e.target.checked;
+      updateCalculations();
+    });
+
+    closeBtn?.addEventListener("click", closeDrawer);
+    backdrop?.addEventListener("click", closeDrawer);
+
+    // Add to Cart handler
+    addCartBtn?.addEventListener("click", async () => {
+      if (!activeArtwork) return;
+      addCartBtn.textContent = "Adding to Order Bag...";
+      addCartBtn.disabled = true;
+
+      try {
+        const payload = {
+          artworkId: activeArtwork.id,
+          storefrontSlug: drawer.getAttribute("data-storefront-slug"),
+          sizeLabel: selectedSize.label,
+          material: document.querySelector("input[name='print_material']:checked")?.value || "fine-art-matte",
+          hasFrame,
+          quantity: 1,
+          cropBox: {
+            topPercent: currentCrop.topPercent,
+            leftPercent: currentCrop.leftPercent,
+            widthPercent: currentCrop.widthPercent,
+            heightPercent: currentCrop.heightPercent,
+          },
+        };
+
+        const res = await fetch("/api/cart/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          addCartBtn.textContent = "✓ Added to Order Bag";
+          setTimeout(() => {
+            closeDrawer();
+            window.location.href = "/cart";
+          }, 600);
+        } else {
+          addCartBtn.textContent = "Add to Order Bag";
+          addCartBtn.disabled = false;
+          alert("Could not add to cart. Please try again.");
+        }
+      } catch (e) {
+        addCartBtn.textContent = "Add to Order Bag";
+        addCartBtn.disabled = false;
+        console.error("Cart add error", e);
+      }
+    });
+
+    // Express Checkout Handler
+    expressBtn?.addEventListener("click", async () => {
+      if (!activeArtwork) return;
+      expressBtn.textContent = "Securing Checkout...";
+      expressBtn.disabled = true;
+
+      try {
+        const payload = {
+          artworkId: activeArtwork.id,
+          storefrontSlug: drawer.getAttribute("data-storefront-slug"),
+          sizeLabel: selectedSize.label,
+          material: document.querySelector("input[name='print_material']:checked")?.value || "fine-art-matte",
+          hasFrame,
+          quantity: 1,
+          cropBox: {
+            topPercent: currentCrop.topPercent,
+            leftPercent: currentCrop.leftPercent,
+            widthPercent: currentCrop.widthPercent,
+            heightPercent: currentCrop.heightPercent,
+          },
+        };
+
+        const res = await fetch("/api/cart/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          window.location.href = "/checkout?express=1";
+        }
+      } catch (e) {
+        expressBtn.textContent = "⚡ Instant Express Checkout";
+        expressBtn.disabled = false;
+      }
+    });
+
+    // Expose openDrawer globally
+    window.openPrintOrderDrawer = openDrawer;
+
+    // Listen for [Order Print] button clicks in the gallery
+    document.addEventListener("click", (e) => {
+      const orderBtn = e.target.closest("[data-order-print-btn]");
+      if (orderBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const artwork = {
+          id: orderBtn.getAttribute("data-artwork-id"),
+          title: orderBtn.getAttribute("data-artwork-title") || "Portrait",
+          imageUrl: orderBtn.getAttribute("data-artwork-image"),
+          width: parseInt(orderBtn.getAttribute("data-artwork-width") || "4000", 10),
+          height: parseInt(orderBtn.getAttribute("data-artwork-height") || "6000", 10),
+        };
+        openDrawer(artwork);
+      }
+    });
+  })();
+</script>

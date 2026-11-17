@@ -1,0 +1,363 @@
+---
+interface Props {
+  galleryId: string;
+  artistName?: string;
+  digitalAllotmentEnabled?: boolean;
+  digitalAllotmentCount?: number;
+  digitalExtraPriceCents?: number;
+  allowPoseTagging?: boolean;
+}
+
+const {
+  galleryId,
+  artistName = "Photographer",
+  digitalAllotmentEnabled = false,
+  digitalAllotmentCount = 0,
+  digitalExtraPriceCents = 0,
+  allowPoseTagging = true,
+} = Astro.props;
+---
+
+<div class="client-favorites-dock-wrap" data-fav-dock hidden>
+  <div class="client-favorites-dock">
+    <div class="fav-dock-left">
+      <span class="fav-dock-heart" aria-hidden="true">♥</span>
+      <div class="fav-dock-text-group">
+        <span class="fav-dock-label"><strong data-fav-dock-count>0</strong> Favorited</span>
+      </div>
+    </div>
+    <div class="fav-dock-actions">
+      <button type="button" class="fav-dock-btn filter-btn" data-fav-filter-btn>
+        View Favorites
+      </button>
+      <button type="button" class="fav-dock-btn download-btn" data-fav-dl-btn title="Download favorited photos as a ZIP">
+        ↓ Download ZIP
+      </button>
+      <button type="button" class="fav-dock-btn clear-btn" data-fav-clear-btn title="Clear all favorites">
+        Clear
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .client-favorites-dock-wrap {
+    position: fixed;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    padding: 0 16px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .client-favorites-dock-wrap[hidden] {
+    display: none !important;
+  }
+
+  .client-favorites-dock {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(31, 36, 44, 0.14);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+    border-radius: 999px;
+    padding: 8px 14px 8px 20px;
+    color: #1f242c;
+    font-size: 13px;
+  }
+
+  .fav-dock-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .fav-dock-text-group {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+
+  .fav-dock-heart {
+    color: #e11d48;
+    font-size: 18px;
+  }
+
+  .fav-dock-label strong {
+    font-weight: 700;
+  }
+
+  .fav-dock-allotment {
+    font-size: 11px;
+    color: #71717a;
+    font-weight: 500;
+  }
+
+  .fav-dock-allotment.has-extra {
+    color: #b45309;
+    font-weight: 600;
+  }
+
+  .fav-dock-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .fav-dock-btn {
+    appearance: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 7px 15px;
+    border-radius: 999px;
+    transition: background 0.15s ease, transform 0.15s ease, color 0.15s ease;
+  }
+
+  .fav-dock-btn.filter-btn {
+    background: #1f242c;
+    color: #fff;
+  }
+
+  .fav-dock-btn.filter-btn:hover {
+    background: #000;
+    transform: scale(1.03);
+  }
+
+  .fav-dock-btn.filter-btn.is-active {
+    background: #e11d48;
+    color: #fff;
+  }
+
+  .fav-dock-btn.checkout-btn {
+    background: #a57a55;
+    color: #fff;
+  }
+
+  .fav-dock-btn.checkout-btn:hover {
+    background: #8e6542;
+    transform: scale(1.03);
+  }
+
+  .fav-dock-btn.download-btn {
+    background: #2e6930;
+    color: #fff;
+  }
+
+  .fav-dock-btn.download-btn:hover {
+    background: #1f4a21;
+    transform: scale(1.03);
+  }
+
+  .fav-dock-btn.clear-btn {
+    background: rgba(31, 36, 44, 0.06);
+    color: rgba(31, 36, 44, 0.7);
+    padding: 7px 11px;
+  }
+
+  .fav-dock-btn.clear-btn:hover {
+    background: rgba(31, 36, 44, 0.12);
+    color: #1f242c;
+  }
+
+  @media (max-width: 680px) {
+    .client-favorites-dock-wrap {
+      bottom: 16px;
+    }
+    .client-favorites-dock {
+      width: 100%;
+      max-width: 380px;
+      justify-content: space-between;
+      padding: 8px 12px 8px 14px;
+      gap: 8px;
+    }
+    .fav-dock-btn {
+      padding: 6px 10px;
+      font-size: 11px;
+    }
+  }
+</style>
+
+<script is:inline define:vars={{ galleryId, digitalAllotmentEnabled, digitalAllotmentCount, digitalExtraPriceCents }}>
+  (function () {
+    if (!galleryId) return;
+
+    let favoritesSet = new Set();
+    let favoritesList = [];
+    let isFilterActive = false;
+    let allotmentSummary = null;
+
+    const dockWrap = document.querySelector("[data-fav-dock]");
+    const dockCount = document.querySelector("[data-fav-dock-count]");
+    const allotmentBadge = document.querySelector("[data-fav-allotment]");
+    const checkoutBtn = document.querySelector("[data-fav-checkout-btn]");
+    const extraPriceSpan = document.querySelector("[data-fav-extra-price]");
+    const filterBtn = document.querySelector("[data-fav-filter-btn]");
+    const downloadBtn = document.querySelector("[data-fav-dl-btn]");
+    const clearBtn = document.querySelector("[data-fav-clear-btn]");
+    const counterBadge = document.querySelector("[data-fav-counter]");
+    const counterCount = document.querySelector("[data-fav-count]");
+
+    async function loadFavorites() {
+      try {
+        const res = await fetch(`/api/client-galleries/favorites?galleryId=${encodeURIComponent(galleryId)}`);
+        const data = await res.json().catch(() => ({}));
+        if (data.ok && Array.isArray(data.favorites)) {
+          favoritesList = data.favorites;
+          favoritesSet.clear();
+          data.favorites.forEach((fav) => {
+            if (fav.artworkId) favoritesSet.add(fav.artworkId);
+          });
+          syncUI();
+        }
+      } catch (e) {
+        console.warn("Failed to load initial favorites", e);
+      }
+    }
+
+    function syncUI() {
+      const count = favoritesSet.size;
+      if (counterCount) counterCount.textContent = String(count);
+      if (counterBadge) counterBadge.hidden = count === 0;
+      if (dockCount) dockCount.textContent = String(count);
+      if (dockWrap) dockWrap.hidden = count === 0;
+
+      if (count === 0 && isFilterActive) {
+        isFilterActive = false;
+      }
+
+      if (filterBtn) {
+        if (isFilterActive) {
+          filterBtn.textContent = "Show All Photos";
+          filterBtn.classList.add("is-active");
+        } else {
+          filterBtn.textContent = "View Favorites";
+          filterBtn.classList.remove("is-active");
+        }
+      }
+
+      document.querySelectorAll("[data-favorite-btn]").forEach((btn) => {
+        const artworkId = btn.getAttribute("data-artwork-id");
+        if (artworkId && favoritesSet.has(artworkId)) {
+          btn.classList.add("is-favorited");
+          btn.setAttribute("aria-pressed", "true");
+        } else {
+          btn.classList.remove("is-favorited");
+          btn.setAttribute("aria-pressed", "false");
+        }
+      });
+
+      // Filter gallery tiles if filter is active
+      const photoTiles = document.querySelectorAll(".paul-photo-tile[data-artwork-id]");
+      photoTiles.forEach((tile) => {
+        const artworkId = tile.getAttribute("data-artwork-id");
+        if (isFilterActive) {
+          if (artworkId && favoritesSet.has(artworkId)) {
+            tile.style.display = "";
+          } else {
+            tile.style.display = "none";
+          }
+        } else {
+          tile.style.display = "";
+        }
+      });
+    }
+
+    async function toggleFavoriteArtwork(artworkId) {
+      const isFav = favoritesSet.has(artworkId);
+      if (isFav) {
+        favoritesSet.delete(artworkId);
+      } else {
+        favoritesSet.add(artworkId);
+      }
+      syncUI();
+
+      try {
+        await fetch("/api/client-galleries/favorites", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ galleryId, artworkId }),
+        });
+      } catch (err) {
+        console.error("Favorite toggle failed", err);
+      }
+    }
+
+    filterBtn?.addEventListener("click", () => {
+      isFilterActive = !isFilterActive;
+      syncUI();
+      if (isFilterActive) {
+        const mosaic = document.querySelector(".paul-photo-mosaic");
+        if (mosaic) {
+          mosaic.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+    });
+
+    downloadBtn?.addEventListener("click", () => {
+      if (favoritesSet.size === 0) return;
+      const ids = Array.from(favoritesSet).join(",");
+      const dlUrl = `/api/client-galleries/download-zip?galleryId=${encodeURIComponent(galleryId)}&type=favorites&artworkIds=${encodeURIComponent(ids)}`;
+
+      const sampleDlBtn = document.querySelector("[data-download-btn]");
+      const requiresPin = sampleDlBtn && sampleDlBtn.getAttribute("data-requires-pin") === "1";
+
+      if (requiresPin) {
+        if (typeof window._triggerPinPromptForUrl === "function") {
+          window._triggerPinPromptForUrl(dlUrl);
+        } else {
+          window.location.href = dlUrl;
+        }
+      } else {
+        window.location.href = dlUrl;
+      }
+    });
+
+    clearBtn?.addEventListener("click", async () => {
+      if (favoritesSet.size === 0) return;
+      if (!confirm("Clear all your favorited photos for this gallery?")) return;
+
+      const idsToClear = Array.from(favoritesSet);
+      favoritesSet.clear();
+      isFilterActive = false;
+      syncUI();
+
+      for (const id of idsToClear) {
+        try {
+          await fetch("/api/client-galleries/favorites", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ galleryId, artworkId: id }),
+          });
+        } catch (e) {
+          // ignore error on batch clear
+        }
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-favorite-btn]");
+      if (btn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const artworkId = btn.getAttribute("data-artwork-id");
+        if (artworkId) {
+          toggleFavoriteArtwork(artworkId);
+        }
+      }
+    });
+
+    loadFavorites();
+  })();
+</script>
