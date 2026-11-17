@@ -4,25 +4,35 @@
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-02-24",
 	"compatibility_flags": ["nodejs_compat"],
+	"account_id": "c1ed3a128361abb909218d88d7f72492",
+	"routes": [
+		{
+			"pattern": "shelleybphotography.flowwebdesigner.com/*",
+			"zone_name": "flowwebdesigner.com"
+		}
+	],
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "shelleyb-photography-db",
-			"database_id": "shelleyb-photography-db"
+			"database_name": "shelleyb-preview-db",
+			"database_id": "d6006c78-294d-47fc-a781-8898f7a2fe43"
 		}
 	],
 	"r2_buckets": [
 		{
 			"binding": "MEDIA",
-			"bucket_name": "shelleyb-photography-media"
+			"bucket_name": "shelleyb-emdash-media"
 		}
 	],
 	"durable_objects": {
 		"bindings": [{ "name": "EMDASH_ROOMS", "class_name": "EmDashRoom" }]
 	},
-	"exports": {
-		"EmDashRoom": { "type": "durable-object", "storage": "sqlite" }
-	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["EmDashRoom"]
+		}
+	],
 	"triggers": {
 		"crons": ["* * * * *"]
 	}
